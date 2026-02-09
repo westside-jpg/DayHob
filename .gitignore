@@ -14,3 +14,8 @@ env/
 # IDE / редактор
 .vscode/
 .idea/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/vcs.xml
+.idea/profiles_settings.xml
+BooRing.iml
