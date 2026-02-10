@@ -45,6 +45,12 @@
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
+.log-in:active {
+    transform: scale(1.10);
+    background: #2b2b2b;
+    transition: 0.1s ease;
+}
+
 /* белая с обводкой */
 .sign-in {
     background: #fff;
@@ -55,4 +61,47 @@
 .sign-in:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.sign-in:active {
+    transform: scale(1.10);
+    background: #e4e4e4;
+    transition: 0.1s ease;
+}
+
+.carousel {
+    margin: 100px auto;
+    width: 90%;
+    border: 5px solid red;
+    display: flex;
+    overflow-x: auto;
+}
+
+.group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1em;
+    animation: spin 40s linear infinite;
+    padding-right: 1em;
+}
+
+.card {
+    flex: 0 0 5em;
+    height: 5em;
+    padding: 1em;
+    background: #8090ff;
+    font-size: 3rem;
+    border-radius: .2em;
+    text-align: center;
+    align-content: center;
+}
+
+.carousel::-webkit-scrollbar {
+    display: none;
+}
+
+@keyframes spin {
+    from {translate: 0;}
+    to {translate: -100%;}
 }
