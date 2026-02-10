@@ -1,0 +1,58 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    display: flex;
+    justify-content: center;
+}
+
+.site-icon {
+    width: 110px;
+    padding-top: 20px;
+}
+
+.footer {
+    padding: 40px 0;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: center;
+    gap: 120px;
+}
+
+.btn {
+    width: 300px;
+    height: 50px;
+    border-radius: 999px;
+    font-family: "Monserrat", sans-serif;
+    font-size: 26px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* чёрная кнопка */
+.log-in {
+    background: #000;
+    color: #fff;
+    border: none;
+}
+
+.log-in:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* белая с обводкой */
+.sign-in {
+    background: #fff;
+    color: #000;
+    border: 2px solid #000;
+}
+
+.sign-in:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
