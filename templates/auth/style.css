@@ -9,12 +9,13 @@
 }
 
 .site-icon {
-    width: 110px;
+    width: 120px;
     padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 .footer {
-    padding: 40px 0;
+    padding-top: 40px;
 }
 
 .footer-content {
@@ -70,11 +71,39 @@
 }
 
 .carousel {
-    margin: 100px auto;
-    width: 90%;
-    border: 5px solid red;
+    margin: 50px auto;
+    width: 100%;
     display: flex;
-    overflow-x: auto;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Адаптивные градиенты (10% ширины карусели) */
+.carousel::before,
+.carousel::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 10%;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.carousel::before {
+    left: 0;
+    background: linear-gradient(to right,
+    rgba(255,255,255,1) 0%,
+    rgba(255,255,255,0.5) 50%,
+    rgba(255,255,255,0) 100%);
+}
+
+.carousel::after {
+    right: 0;
+    background: linear-gradient(to left,
+    rgba(255,255,255,1) 0%,
+    rgba(255,255,255,0.5) 50%,
+    rgba(255,255,255,0) 100%);
 }
 
 .group {
@@ -87,18 +116,19 @@
 }
 
 .card {
-    flex: 0 0 5em;
-    height: 5em;
-    padding: 1em;
-    background: #8090ff;
-    font-size: 3rem;
+    flex: 0 0 auto;
+    width: 300px;
+    height: 480px;
+    padding: 0;
+    font-size: 0;
     border-radius: .2em;
-    text-align: center;
-    align-content: center;
 }
 
-.carousel::-webkit-scrollbar {
-    display: none;
+.card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
 }
 
 @keyframes spin {
