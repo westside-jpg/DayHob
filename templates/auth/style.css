@@ -16,12 +16,13 @@
 
 .footer {
     padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 .footer-content {
     display: flex;
     justify-content: center;
-    gap: 120px;
+    gap: clamp(15px, 8vw, 120px);
 }
 
 .btn {
