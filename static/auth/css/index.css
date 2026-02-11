@@ -109,7 +109,7 @@
     align-items: center;
     justify-content: center;
     gap: 1em;
-    animation: spin 40s linear infinite;
+    animation: spin 5s linear infinite;
     padding-right: 1em;
 }
 

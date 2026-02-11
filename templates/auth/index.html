@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DayHob</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="shortcut icon" href="images/logo.svg" type="image/x-icon">
+    <link rel="stylesheet" href="../../static/auth/css/index.css">
+    <link rel="shortcut icon" href="../../static/auth/images/logo.svg" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
@@ -13,33 +13,37 @@
 <body>
     <header class="header">
         <div>
-            <img src="images/logo.svg" alt="" class="site-icon">
+            <img src="../../static/auth/images/logo.svg" alt="" class="site-icon">
         </div>
     </header>
     <div class="carousel">
         <div class="group">
-            <img src="images/img1.svg" class="card" alt="">
-            <img src="images/img2.svg" class="card" alt="">
-            <img src="images/img3.svg" class="card" alt="">
-            <img src="images/img4.svg" class="card" alt="">
-            <img src="images/img5.svg" class="card" alt="">
-            <img src="images/img6.svg" class="card" alt="">
-            <img src="images/img7.svg" class="card" alt="">
+            <img src="../../static/auth/images/img1.svg" class="card" alt="">
+            <img src="../../static/auth/images/img2.svg" class="card" alt="">
+            <img src="../../static/auth/images/img3.svg" class="card" alt="">
+            <img src="../../static/auth/images/img4.svg" class="card" alt="">
+            <img src="../../static/auth/images/img5.svg" class="card" alt="">
+            <img src="../../static/auth/images/img6.svg" class="card" alt="">
+            <img src="../../static/auth/images/img7.svg" class="card" alt="">
         </div>
         <div aria-hidden class="group">
-            <img src="images/img1.svg" class="card" alt="">
-            <img src="images/img2.svg" class="card" alt="">
-            <img src="images/img3.svg" class="card" alt="">
-            <img src="images/img4.svg" class="card" alt="">
-            <img src="images/img5.svg" class="card" alt="">
-            <img src="images/img6.svg" class="card" alt="">
-            <img src="images/img7.svg" class="card" alt="">
+            <img src="../../static/auth/images/img1.svg" class="card" alt="">
+            <img src="../../static/auth/images/img2.svg" class="card" alt="">
+            <img src="../../static/auth/images/img3.svg" class="card" alt="">
+            <img src="../../static/auth/images/img4.svg" class="card" alt="">
+            <img src="../../static/auth/images/img5.svg" class="card" alt="">
+            <img src="../../static/auth/images/img6.svg" class="card" alt="">
+            <img src="../../static/auth/images/img7.svg" class="card" alt="">]
         </div>
     </div>
     <footer class="footer">
         <div class="footer-content">
-            <button class="btn log-in">Войти</button>
-            <button class="btn sign-in">Регистрация</button>
+            <form action="/login" method="get">
+                <button class="btn log-in" type="submit">Войти</button>
+            </form>
+            <form action="/signin" method="get">
+                <button class="btn sign-in">Регистрация</button>
+            </form>
         </div>
     </footer>
 </body>

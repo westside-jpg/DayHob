@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="31b7e6ac-349e-4882-87c2-9327fcede027" name="Changes" comment="little changes in style.css">
+      <change afterPath="$PROJECT_DIR$/.idea/BooRing.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/routers/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/auth/images/img1.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/auth/images/img1.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/auth/images/img2.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/auth/images/img2.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/auth/images/img3.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/auth/images/img3.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/auth/images/img4.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/auth/images/img4.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/auth/images/img5.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/auth/images/img5.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/auth/images/img6.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/auth/images/img6.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/auth/images/img7.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/auth/images/img7.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/auth/images/logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/auth/images/logo.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/auth/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/auth/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/auth/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/auth/css/index.css" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;westside-jpg&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/westside-jpg/DayHob.git&quot;,
+    &quot;accountId&quot;: &quot;5eacd1fb-fb61-4125-84aa-fa907b0ce898&quot;
+  }
+}</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="QODANA_PROBLEMS_VIEW_TAB" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="39Pb4BZrBChSvtEmdlLsqMUv709" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;JavaScript Debug.index.html.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/daniil/Desktop/PET/Python/DayHob/templates/auth/images&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/templates/auth/images" />
+      <recent name="$PROJECT_DIR$/templates/auth" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/static/auth/css" />
+      <recent name="$PROJECT_DIR$/static/auth" />
+      <recent name="$PROJECT_DIR$/static" />
+      <recent name="$PROJECT_DIR$/templates/auth/images" />
+      <recent name="$PROJECT_DIR$/templates/auth" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-ce6832f46686-7b97d883f26b-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.25557.178" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="31b7e6ac-349e-4882-87c2-9327fcede027" name="Changes" comment="" />
+      <created>1770600459863</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1770600459863</updated>
+      <workItem from="1770694245297" duration="26967000" />
+    </task>
+    <task id="LOCAL-00001" summary="first steps. main, databases, env, config, models">
+      <option name="closed" value="true" />
+      <created>1770610843885</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1770610843885</updated>
+    </task>
+    <task id="LOCAL-00002" summary="describe tables in models.py">
+      <option name="closed" value="true" />
+      <created>1770617154007</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1770617154007</updated>
+    </task>
+    <task id="LOCAL-00003" summary="make a carousel in css">
+      <option name="closed" value="true" />
+      <created>1770729970312</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1770729970312</updated>
+    </task>
+    <task id="LOCAL-00004" summary="finish style of main page">
+      <option name="closed" value="true" />
+      <created>1770735529694</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1770735529694</updated>
+    </task>
+    <task id="LOCAL-00005" summary="little changes in style.css">
+      <option name="closed" value="true" />
+      <created>1770773642400</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1770773642400</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="first steps. main, databases, env, config, models" />
+    <MESSAGE value="describe tables in models.py" />
+    <MESSAGE value="make a carousel in css" />
+    <MESSAGE value="finish style of main page" />
+    <MESSAGE value="little changes in style.css" />
+    <option name="LAST_COMMIT_MESSAGE" value="little changes in style.css" />
+  </component>
+</project>
