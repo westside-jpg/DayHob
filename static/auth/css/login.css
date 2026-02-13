@@ -1,0 +1,104 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.header {
+    display: flex;
+    justify-content: center;
+}
+
+.site-icon {
+    width: clamp(80px, 15vw, 150px);
+    padding-top: 20px;
+    padding-bottom: 40px;
+    transition: 0.3s ease;
+    cursor: pointer;
+}
+
+.site-icon:hover {
+    transform: scale(1.05);
+}
+
+.site-icon:active {
+    transform: scale(1.10);
+    transition: 0.1s ease;
+}
+
+.btn {
+    width: min(300px, 80%);
+    height: clamp(40px, 8vh, 60px);
+    border-radius: 999px;
+    background: #ffffff;
+    color: #000000;
+    border-width: 2px;
+    font-family: "Montserrat", sans-serif;
+    font-size: clamp(16px, 4vw, 24px);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    background: #000000;
+    color: #ffffff;
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.btn:active {
+    transform: scale(1.10);
+    background: #2b2b2b;
+    transition: 0.1s ease;
+}
+
+.main {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(15px, 4vh, 40px); /* Адаптивный отступ между элементами */
+
+    width: min(90%, 800px); /* На узких экранах 90%, но не больше 800px */
+    padding: 50px 10px 60px 10px;
+
+    border: 2px solid black;
+    border-radius: clamp(30px, 8vw, 100px); /* Адаптивный радиус скругления */
+    transition: all 0.3s ease;
+}
+
+.login, .password {
+    width: min(100%, 500px); /* Контейнеры полей занимают всю ширину родителя, но не больше 500px */
+}
+
+.input {
+    width: 100%;
+    height: clamp(50px, 8vh, 70px);
+    border: 2px solid black;
+    border-radius: 999px;
+    font-size: clamp(18px, 4vw, 30px);
+    padding-left: clamp(10px, 3vw, 25px);
+    box-sizing: border-box;
+    background: #ffffff;
+    color: #000000;
+    transition: all 0.3s ease;
+}
+
+.text {
+    padding-left: clamp(5px, 2vw, 15px);
+    font-size: clamp(14px, 3vw, 18px);
+    margin: 0 0 5px 0;
+}
+
+.input:focus {
+    transform: scale(1.015);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.footer {
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}

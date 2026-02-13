@@ -11,7 +11,17 @@
 .site-icon {
     width: 150px;
     padding-top: 20px;
-    padding-bottom: 20px;
+    padding-bottom: 15px;
+    transition: 0.5s ease;
+}
+
+.site-icon:hover {
+    transform: scale(1.05);
+}
+
+.site-icon:active {
+    transform: scale(1.10);
+    transition: 0.1s ease;
 }
 
 .footer {
@@ -26,13 +36,17 @@
 }
 
 .btn {
-    width: 350px;
-    height: 60px;
+    width: min(350px, 80vw);
+    height: clamp(45px, 8vh, 65px);
     border-radius: 999px;
     font-family: "Montserrat", sans-serif;
-    font-size: 30px;
+    font-size: clamp(18px, 5vw, 28px);
     cursor: pointer;
     transition: all 0.3s ease;
+    white-space: nowrap;
+    padding: 0 15px;
+    box-sizing: border-box;
+    display: inline-block;
 }
 
 .log-in {
@@ -109,7 +123,7 @@
     align-items: center;
     justify-content: center;
     gap: 1em;
-    animation: spin 5s linear infinite;
+    animation: spin 40s linear infinite;
     padding-right: 1em;
 }
 
