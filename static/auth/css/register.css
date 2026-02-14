@@ -12,7 +12,7 @@ html, body {
 .site-icon {
     width: clamp(80px, 15vw, 150px);
     padding-top: 20px;
-    padding-bottom: 40px;
+    padding-bottom: 20px;
     transition: 0.3s ease;
     cursor: pointer;
 }
@@ -67,11 +67,21 @@ html, body {
     transition: all 0.3s ease;
 }
 
-.login, .password {
-    width: 80%
+.footer {
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
 }
 
-.input {
+.login,
+.mail,
+.passwords {
+    width: 100%;
+}
+
+.inputshort {
     width: 100%;
     height: clamp(50px, 8vh, 70px);
     border: 2px solid black;
@@ -84,21 +94,42 @@ html, body {
     transition: all 0.3s ease;
 }
 
-.text {
-    padding-left: clamp(5px, 2vw, 15px);
-    font-size: clamp(14px, 3vw, 18px);
-    margin: 0 0 5px 0;
+.inputlong {
+    width: 100%;
+    height: clamp(50px, 8vh, 70px);
+    border: 2px solid black;
+    border-radius: 999px;
+    font-size: clamp(18px, 4vw, 30px);
+    padding-left: clamp(10px, 3vw, 25px);
+    box-sizing: border-box;
+    background: #ffffff;
+    color: #000000;
+    transition: all 0.3s ease;
 }
 
-.input:focus {
+.inputshort:focus {
     transform: scale(1.015);
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-.footer {
-    margin: 0 auto;
+.inputlong:focus {
+    transform: scale(1.015);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.passwords {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
+    flex-direction: row;
+    gap: clamp(15px, 3vw, 100px);
+}
+
+.setpassword,
+.repeatpassword {
+    flex: 1;
+}
+
+.text {
+    padding-left: clamp(5px, 2vw, 15px);
+    font-size: clamp(14px, 3vw, 18px);
+    margin: 0 0 5px 0;
 }
