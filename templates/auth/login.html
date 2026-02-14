@@ -16,18 +16,20 @@
             <img class="site-icon" src="../../static/auth/images/logo.svg" alt="">
         </a>
     </header>
-    <main class="main">
-        <div class="login">
-            <p class="text">Логин</p>
-            <input class="input">
-        </div>
-        <div class="password">
-            <p class="text">Пароль</p>
-            <input class="input" type="password">
-        </div>
-    </main>
-    <footer class="footer">
-        <button class="btn" type="submit">Войти</button>
-    </footer>
+    <form action="/login" method="post">
+        <main class="main">
+            <div class="login">
+                <label for="username" class="text">Логин</label>
+                <input id="username" class="input" name="username" required>
+            </div>
+            <div class="password">
+                <label for="password" class="text">Пароль</label>
+                <input id="password" class="input" type="password" name="password" required>
+            </div>
+        </main>
+        <footer class="footer">
+            <button class="btn" type="submit">Войти</button>
+        </footer>
+    </form>
 </body>
 </html>
