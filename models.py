@@ -12,8 +12,18 @@ class Users(Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
-    password: Mapped[str] = mapped_column(String(100), nullable=False)
+    password: Mapped[str] = mapped_column(String(255), nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    created_at: Mapped[created_at]
+
+class PendingUsers(Base):
+    __tablename__ = "pending_users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(String(50))
+    email: Mapped[str] = mapped_column(String(255))
+    password: Mapped[str] = mapped_column(String(255))
+    code: Mapped[str] = mapped_column(String(6))
     created_at: Mapped[created_at]
 
 class Tasks(Base):

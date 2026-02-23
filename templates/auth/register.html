@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DayHob</title>
+    <title>Регистрация</title>
     <link rel="stylesheet" href="../../static/auth/css/register.css">
     <link rel="shortcut icon" href="../../static/auth/images/logo.svg" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,13 +20,20 @@
         </header>
         <form action="/register" method="post">
             <main class="main">
+                {% if errors %}
+                <div class="error-container">
+                    {% for error in errors %}
+                    <div class="error-item">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
                 <div class="login">
                     <label for="username" class="text">Придумайте логин</label>
-                    <input id="username" placeholder="BestUserEver123" class="inputlong" name="username" required>
+                    <input id="username" placeholder="BestUserEver123" class="inputlong" name="username" required value="{{ username or '' }}">
                 </div>
                 <div class="mail">
                     <label for="email" class="text">Введите свою почту</label>
-                    <input id="email" placeholder="user@gmail.com" class="inputlong" type="email" name="email" required>
+                    <input id="email" placeholder="user@gmail.com" class="inputlong" type="email" name="email" required value="{{ email or '' }}">
                 </div>
                 <div class="passwords">
                     <div class="setpassword">

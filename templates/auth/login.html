@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DayHob</title>
+    <title>Вход</title>
     <link rel="stylesheet" href="../../static/auth/css/login.css">
     <link rel="shortcut icon" href="../../static/auth/images/logo.svg" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,9 +18,14 @@
     </header>
     <form action="/login" method="post">
         <main class="main">
+            {% if error %}
+                <div class="error-container">
+                    <div class="error-item">{{ error }}</div>
+                </div>
+            {% endif %}
             <div class="login">
                 <label for="username" class="text">Логин</label>
-                <input id="username" class="input" name="username" required>
+                <input id="username" class="input" name="username" required value="{{ username or '' }}">
             </div>
             <div class="password">
                 <label for="password" class="text">Пароль</label>

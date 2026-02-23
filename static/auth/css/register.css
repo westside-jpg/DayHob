@@ -133,3 +133,32 @@ html, body {
     font-size: clamp(14px, 3vw, 18px);
     margin: 0 0 5px 0;
 }
+
+.error-container {
+    width: 90%;
+    background-color: #fee;
+    border: 2px solid #f44;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    animation: shake 0.3s ease;
+    text-align: center;
+}
+
+.error-item {
+    color: #c00;
+    font-size: clamp(14px, 3vw, 16px);
+    font-weight: 500;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.error-item:last-child {
+    margin-bottom: 0;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+}

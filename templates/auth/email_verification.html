@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подтверждение почты</title>
+    <link rel="stylesheet" href="../../static/auth/css/email_verification.css">
+    <link rel="shortcut icon" href="../../static/auth/images/logo.svg" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div>
+            <img src="../../static/auth/images/logo.svg" alt="" class="site-icon">
+        </div>
+    </header>
+    <form action="/register/email_verification" method="post">
+        <main class="main">
+            <img class="mail-icon" src="../../static/auth/images/mail.svg" alt="">
+            <p class="text">Проверьте почту и введите 6-значный код ниже</p>
+            <div class="code-inputs">
+                <input type="text" maxlength="1" class="code-input">
+                <input type="text" maxlength="1" class="code-input">
+                <input type="text" maxlength="1" class="code-input">
+                <input type="text" maxlength="1" class="code-input">
+                <input type="text" maxlength="1" class="code-input">
+                <input type="text" maxlength="1" class="code-input">
+            </div>
+            <input type="hidden" name="code" id="full-code">
+        </main>
+        <footer class="footer">
+            <button class="btn" type="submit">Подтвердить</button>
+        </footer>
+    </form>
+    <script src="../../static/auth/js/email_verification.js"></script>
+</body>
+</html>
