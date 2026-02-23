@@ -113,3 +113,22 @@ html, body {
     transform: scale(1.08);
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
+
+.error-container {
+    width: 90%;
+    background-color: #fee;
+    border: 2px solid #f44;
+    border-radius: 15px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-top: 15px;
+    animation: shake 0.3s ease;
+    text-align: center;
+}
+
+.error-item {
+    color: #c00;
+    font-size: clamp(14px, 3vw, 16px);
+    font-weight: 500;
+    line-height: 1.6;
+}

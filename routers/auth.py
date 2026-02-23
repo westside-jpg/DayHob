@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Request, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
-from services.auth import check_register, register_user, hash_password, verify_login, register_pending_user
+from services.auth import check_register, hash_password, verify_login, register_pending_user, \
+    send_verification_email, check_verification_email_and_register
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -16,8 +17,8 @@ def register_page_get(request: Request):
     return templates.TemplateResponse("auth/register.html", {"request": request})
 
 @router.get("/register/email_verification", response_class=HTMLResponse)
-def email_verification_page_get(request: Request):
-    return templates.TemplateResponse("auth/email_verification.html", {"request": request})
+def email_verification_page_get(request: Request, email: str):
+    return templates.TemplateResponse("auth/email_verification.html", {"request": request, "email": email})
 
 # == POST-РУЧКИ == #
 @router.post("/login", response_class=HTMLResponse)
@@ -56,9 +57,18 @@ def register_page_post(
         )
 
     hashed_password = hash_password(password)
-    register_pending_user(username, hashed_password, email_clean)
-    return RedirectResponse("/register/email_verification", status_code=303)
+    code = register_pending_user(username, hashed_password, email_clean)
+    send_verification_email(email_clean, code)
+    return RedirectResponse(f"/register/email_verification?email={email_clean}", status_code=303)
 
 @router.post("/register/email_verification", response_class=HTMLResponse)
-def email_verification_page_post(request: Request):
-    ...
+def email_verification_page_post(request: Request,
+                                 code: str = Form(...),
+                                 email: str = Form(...)):
+
+    approve, error = check_verification_email_and_register(email, code)
+
+    if not approve:
+        return templates.TemplateResponse("auth/email_verification.html", {"request": request, "error": error, "email": email})
+
+    return templates.TemplateResponse("auth/login.html", {"request": request})

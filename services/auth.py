@@ -1,9 +1,15 @@
 from sqlalchemy import select
+from sqlalchemy.sql.expression import insert, delete
+
 from database import session_factory
 from models import Users, PendingUsers
+from config import settings
 import re
 import bcrypt
 import random
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 # == РЕГИСТРАЦИЯ == #
 def check_email(email: str):
@@ -89,7 +95,7 @@ def hash_password(password: str):
     hashed_password = hashed_password.decode('utf-8')
     return hashed_password
 
-def register_pending_user(username, password, email) -> str:
+def register_pending_user(username: str, password: str, email: str) -> str:
     code = str(random.randint(100000, 999999))
     with session_factory() as session:
         session.add(PendingUsers(
@@ -100,10 +106,57 @@ def register_pending_user(username, password, email) -> str:
         session.commit()
     return code
 
-def register_user(username, email, password):
+
+def send_verification_email(email: str, code: str):
+    try:
+        msg = MIMEMultipart()
+        msg["From"] = settings.MAIL_EMAIL
+        msg["To"] = email
+        msg["Subject"] = "Подтверждение почты — DayHob"
+
+        body = f"<p>Ваш код подтверждения: <b>{code}</b></p><p>Не передавайте его никому.</p>"
+        msg.attach(MIMEText(body, "html"))
+
+        with smtplib.SMTP("smtp.office365.com", 587, timeout=10) as server:
+            server.starttls()
+            server.login(settings.MAIL_EMAIL, settings.MAIL_PASSWORD)
+            server.sendmail(settings.MAIL_EMAIL, email, msg.as_string())
+
+    except Exception as e:
+        print(f"Ошибка отправки письма: {e}")
+
+def check_verification_email_and_register(email: str, input_code: str):
     with session_factory() as session:
-        session.add(Users(username=username, email=email, password=password))
+        query = select(
+            PendingUsers.username,
+            PendingUsers.password,
+            PendingUsers.email
+        ).where(
+            PendingUsers.email == email,
+            PendingUsers.code == input_code
+        )
+        result = session.execute(query)
+
+        row = result.first()
+
+        if not row:
+            error = "Код введен неверно или пользователь с такой почтой не найден"
+            return False, error
+
+        username, password, email = row
+
+        query = insert(Users).values(
+            username=username,
+            password=password,
+            email=email
+        )
+        session.execute(query)
+
+        query = delete(PendingUsers).where(PendingUsers.email == email)
+        session.execute(query)
         session.commit()
+
+    return True, None
 
 # == ВХОД == #
 def verify_login(input_username: str, input_password: str):
