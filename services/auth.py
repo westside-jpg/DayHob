@@ -108,22 +108,17 @@ def register_pending_user(username: str, password: str, email: str) -> str:
 
 
 def send_verification_email(email: str, code: str):
-    try:
-        msg = MIMEMultipart()
-        msg["From"] = settings.MAIL_EMAIL
-        msg["To"] = email
-        msg["Subject"] = "Подтверждение почты — DayHob"
+    msg = MIMEMultipart()
+    msg["From"] = f"DayHob <{settings.MAIL_EMAIL}>"
+    msg["To"] = email
+    msg["Subject"] = "Подтверждение почты — DayHob"
 
-        body = f"<p>Ваш код подтверждения: <b>{code}</b></p><p>Не передавайте его никому.</p>"
-        msg.attach(MIMEText(body, "html"))
+    body = f"<p>Ваш код подтверждения: <b>{code}</b></p><p>Не передавайте его никому.</p>"
+    msg.attach(MIMEText(body, "html"))
 
-        with smtplib.SMTP("smtp.office365.com", 587, timeout=10) as server:
-            server.starttls()
-            server.login(settings.MAIL_EMAIL, settings.MAIL_PASSWORD)
-            server.sendmail(settings.MAIL_EMAIL, email, msg.as_string())
-
-    except Exception as e:
-        print(f"Ошибка отправки письма: {e}")
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(settings.MAIL_EMAIL, settings.MAIL_PASSWORD)
+        server.sendmail(settings.MAIL_EMAIL, email, msg.as_string())
 
 def check_verification_email_and_register(email: str, input_code: str):
     with session_factory() as session:
@@ -140,7 +135,7 @@ def check_verification_email_and_register(email: str, input_code: str):
         row = result.first()
 
         if not row:
-            error = "Код введен неверно или пользователь с такой почтой не найден"
+            error = "Код введен неверно"
             return False, error
 
         username, password, email = row
@@ -166,7 +161,7 @@ def verify_login(input_username: str, input_password: str):
         row = result.first()
 
         if row is None:
-            error = "Пользователь с таким именем не найден"
+            error = "Неверный логин или пароль"
             return False, error
 
         password_db = row[0]
@@ -174,7 +169,7 @@ def verify_login(input_username: str, input_password: str):
         is_valid = bcrypt.checkpw(input_password.encode('utf-8'), password_db.encode('utf-8'))
 
         if not is_valid:
-            error = "Неверный пароль для пользователя"
+            error = "Неверный логин или пароль"
             return False, error
 
         return is_valid, None
