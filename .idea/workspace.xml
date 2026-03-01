@@ -4,9 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="31b7e6ac-349e-4882-87c2-9327fcede027" name="Changes" comment="">
+    <list default="true" id="31b7e6ac-349e-4882-87c2-9327fcede027" name="Changes" comment="make email code send">
+      <change afterPath="$PROJECT_DIR$/routers/feed.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/auth_jwt.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/dependencies.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/routers/auth.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,8 +21,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="JavaScript File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -203,7 +208,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771845137441</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="make email code send">
+      <option name="closed" value="true" />
+      <created>1772027299895</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1772027299895</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -223,6 +236,7 @@
     <MESSAGE value="add check and validation data from registration forms without password-hash, email verification and error html page" />
     <MESSAGE value="hashing passwords, errors page in both register.html and login.html, full page email verification without errors and email send, new head names on pages" />
     <MESSAGE value="finish all links between code, but one problem left that mail don't sends" />
-    <option name="LAST_COMMIT_MESSAGE" value="finish all links between code, but one problem left that mail don't sends" />
+    <MESSAGE value="make email code send" />
+    <option name="LAST_COMMIT_MESSAGE" value="make email code send" />
   </component>
 </project>

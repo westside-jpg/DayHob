@@ -3,6 +3,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from services.auth import check_register, hash_password, verify_login, register_pending_user, \
     send_verification_email, check_verification_email_and_register
+from services.auth_jwt import create_access_token
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -30,7 +31,19 @@ def login_page_post(
     approve, error = verify_login(username, password)
     if not approve:
         return templates.TemplateResponse("auth/login.html", {"request": request, "error": error, "username": username})
-    return templates.TemplateResponse("feed/feed.html", {"request": request})
+
+    token = create_access_token(username)
+
+    redirect = RedirectResponse("/feed", status_code=303)
+
+    redirect.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        max_age=30 * 24 * 60 * 60
+    )
+
+    return redirect
 
 
 @router.post("/register", response_class=HTMLResponse)

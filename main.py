@@ -5,10 +5,12 @@ from fastapi.staticfiles import StaticFiles
 from database import sync_engine
 from models import Base
 from routers.auth import router as auth_router
+from routers.feed import router as feed_router
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 app.include_router(auth_router)
+app.include_router(feed_router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 Base.metadata.drop_all(bind=sync_engine)
