@@ -3,9 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Лента</title>
+    <link rel="stylesheet" href="../../static/feed/css/feed.css">
+    <link rel="shortcut icon" href="../../static/feed/images/logo.svg" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-    <p>Самая лучшая лента</p>
+    <div class="menu">
+        <img class="logo" src="../../static/feed/images/logo.svg" alt="">
+        <div class="search">
+            <img src="../../static/feed/images/search.svg" alt="">
+            <p>Поиск</p>
+        </div>
+        <div class="push">
+            <img src="../../static/feed/images/push.svg" alt="">
+            <p>Пуши</p>
+        </div>
+        <div class="friends">
+            <img src="../../static/feed/images/friends.svg" alt="">
+            <p>Друзья</p>
+        </div>
+        <div class="chats">
+            <img src="../../static/feed/images/chats.svg" alt="">
+            <p>Чаты</p>
+        </div>
+        <div class="daily">
+            <p>ДО СЛЕДУЮЩЕГО ДЕЙЛА</p>
+        </div>
+        <div class="profile">
+            <p>{{ user.username }}</p>
+        </div>
+    </div>
+    <div class="feed">
+        
+    </div>
 </body>
 </html>

@@ -4,14 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="31b7e6ac-349e-4882-87c2-9327fcede027" name="Changes" comment="make email code send">
-      <change afterPath="$PROJECT_DIR$/routers/feed.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/auth_jwt.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/dependencies.py" afterDir="false" />
+    <list default="true" id="31b7e6ac-349e-4882-87c2-9327fcede027" name="Changes" comment="make jwt">
+      <change afterPath="$PROJECT_DIR$/static/feed/images/chats.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/feed/images/friends.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/feed/images/logo.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/feed/images/push.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/feed/images/search.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routers/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/routers/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/feed/feed.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/feed/css/feed.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/feed/feed.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/feed/feed.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,12 +37,12 @@
     &quot;assignee&quot;: &quot;westside-jpg&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/westside-jpg/DayHob.git&quot;,
-    &quot;accountId&quot;: &quot;5eacd1fb-fb61-4125-84aa-fa907b0ce898&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/westside-jpg/DayHob.git",
+    "accountId": "5eacd1fb-fb61-4125-84aa-fa907b0ce898"
   }
-}</component>
+}]]></component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="QODANA_PROBLEMS_VIEW_TAB" />
   </component>
@@ -62,7 +64,7 @@
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/daniil/Desktop/PET/Python/DayHob/static/auth/images&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/daniil/Desktop/PET/Python/DayHob/static/feed/images&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -74,15 +76,16 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/static/feed/images" />
       <recent name="$PROJECT_DIR$/templates/auth/images" />
       <recent name="$PROJECT_DIR$/templates/auth" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/static/feed/css" />
       <recent name="$PROJECT_DIR$/static/auth/js" />
       <recent name="$PROJECT_DIR$/static/auth/css" />
       <recent name="$PROJECT_DIR$/static/auth" />
       <recent name="$PROJECT_DIR$/static" />
-      <recent name="$PROJECT_DIR$/templates/auth/images" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -103,6 +106,7 @@
       <workItem from="1770792926510" duration="16391000" />
       <workItem from="1771291985581" duration="6243000" />
       <workItem from="1771821580883" duration="6307000" />
+      <workItem from="1772346508459" duration="1953000" />
     </task>
     <task id="LOCAL-00001" summary="first steps. main, databases, env, config, models">
       <option name="closed" value="true" />
@@ -237,6 +241,7 @@
     <MESSAGE value="hashing passwords, errors page in both register.html and login.html, full page email verification without errors and email send, new head names on pages" />
     <MESSAGE value="finish all links between code, but one problem left that mail don't sends" />
     <MESSAGE value="make email code send" />
-    <option name="LAST_COMMIT_MESSAGE" value="make email code send" />
+    <MESSAGE value="make jwt" />
+    <option name="LAST_COMMIT_MESSAGE" value="make jwt" />
   </component>
 </project>
