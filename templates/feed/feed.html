@@ -15,29 +15,65 @@
         <img class="logo" src="../../static/feed/images/logo.svg" alt="">
         <div class="search">
             <img src="../../static/feed/images/search.svg" alt="">
-            <p>Поиск</p>
+            <p class="menu-text">Поиск</p>
         </div>
         <div class="push">
             <img src="../../static/feed/images/push.svg" alt="">
-            <p>Пуши</p>
+            <p class="menu-text">Пуши</p>
         </div>
         <div class="friends">
             <img src="../../static/feed/images/friends.svg" alt="">
-            <p>Друзья</p>
+            <p class="menu-text">Друзья</p>
         </div>
         <div class="chats">
             <img src="../../static/feed/images/chats.svg" alt="">
-            <p>Чаты</p>
+            <p class="menu-text">Чаты</p>
         </div>
         <div class="daily">
-            <p>ДО СЛЕДУЮЩЕГО ДЕЙЛА</p>
+            <p class="daily-time">13:23</p>
+            <p class="daily-label">ДО СЛЕДУЮЩЕГО ДЕЙЛА</p>
         </div>
         <div class="profile">
-            <p>{{ user.username }}</p>
+            <img src="{{ user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="avatar">
+            <p class="menu-text">{{ user.username }}</p>
         </div>
     </div>
     <div class="feed">
-        
+        <div class="task">
+            <p>Сделать дело, которое постоянно откладывал</p>
+        </div>
+        <div class="posts">
+            <div class="post-wrapper">
+                <div class="post">
+                    <div class="post-header">
+                        <img class="post-avatar" src="/static/feed/images/default_avatar.svg" alt="">
+                        <div class="post-user-info">
+                            <p class="post-username">danya</p>
+                            <p class="post-time">1 час назад</p>
+                        </div>
+                        <button class="post-info-btn">i</button>
+                    </div>
+                    <img class="post-image" src="https://placehold.co/600x400" alt="">
+                    <p class="post-text">Все говорили, что заводить дружбу с тигром — плохая идея...</p>
+                </div>
+                <div class="post-footer">
+                    <div class="like">
+                        <img src="/static/feed/images/like.svg" alt="">
+                        <p>20K</p>
+                    </div>
+                    <div class="comment">
+                        <img src="/static/feed/images/comment.svg" alt="">
+                        <p>132</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="add-post">
+        <button class="new-post">
+            <p>+</p>
+        </button>
+        <p>Создать пост</p>
     </div>
 </body>
 </html>
