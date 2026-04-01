@@ -1,6 +1,7 @@
 body {
     display: flex;
     flex-direction: row;
+    height: 100%;
 }
 
 html, body {
@@ -9,12 +10,45 @@ html, body {
     font-family: 'Montserrat', sans-serif;
 }
 
+.feed {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
 .menu {
     width: 300px;
+    min-width: 300px;
     display: flex;
     flex-direction: column;
     gap: 15px;
     padding: 20px;
+}
+
+.search, .push, .friends, .chats, .profile {
+    transition: all 0.3s ease;
+}
+
+.search:hover, .push:hover, .friends:hover, .chats:hover, .profile:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.search:active, .push:active, .friends:active, .chats:active, .profile:active {
+    transform: scale(1.10);
+    background: black;
+    transition: 0.1s ease;
+    color: white;
+}
+
+.search:active img, .push:active img, .friends:active img, .chats:active img, .profile:active img {
+    filter: invert(1);
+}
+
+.avatar {
+    z-index: auto;
 }
 
 .logo {
@@ -36,6 +70,25 @@ html, body {
     cursor: pointer;
 }
 
+.task {
+    width: 100%;
+    max-width: 530px;
+    box-sizing: border-box;
+    border: 2px solid black;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 25px;
+    margin-bottom: 20px;
+}
+
+.task p {
+    font-size: 22px;
+    font-weight: 600;
+    text-align: center;
+    margin: 0;
+}
 
 .post-header {
     display: flex;
@@ -45,11 +98,12 @@ html, body {
 }
 
 .post {
-    width: 500px;
+    width: 530px;
+    box-sizing: border-box;
     border: 2px solid black;
     border-radius: 20px;
     overflow: hidden;
-    padding: 15px;
+    padding: 0 15px 15px 15px;
 }
 
 .post-image {
@@ -64,14 +118,95 @@ html, body {
     object-fit: cover;
 }
 
+.post-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.post-username {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.post-time {
+    font-size: 14px;
+    font-weight: 400;
+    color: gray;
+    margin: 0;
+}
+
+.post-info-btn {
+    width: 35px;
+    height: 35px;
+    border: 2px solid black;
+    border-radius: 50%;
+    background: white;
+    font-size: 24px;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.comment img {
+    width: 32px;
+    height: 32px;
+    transition: filter 0.2s ease;
+    cursor: pointer;
+}
+
+.like img {
+    width: 36px;
+    height: 36px;
+    transition: filter 0.2s ease;
+    cursor: pointer;
+}
+
+.like:hover img {
+    filter: invert(27%) sepia(100%) saturate(700%) hue-rotate(320deg);
+}
+
+.comment:hover img {
+    filter: invert(27%) sepia(100%) saturate(700%) hue-rotate(200deg);
+}
+
+.like.liked img {
+    filter: invert(27%) sepia(100%) saturate(700%) hue-rotate(320deg);
+}
+
+.like-icon:active {
+    transform: scale(1.10);
+    transition: 0.1s ease;
+}
+
 .post-footer {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    padding: 10px 20px;
+    border: 2px solid black;
+    border-radius: 30px;
+    width: fit-content;
+    margin-top: 10px;
 }
 
 .like, .comment {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.like p, .comment p {
+    font-size: 30px;
+    font-weight: 500;
+    margin: 0;
 }
 
 .menu-text {
@@ -87,6 +222,52 @@ html, body {
     object-fit: cover;
 }
 
+.add-post {
+    width: 250px;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    align-self: stretch;
+}
+
+.new-post {
+    width: 180px;
+    height: 180px;
+    border: 2px solid black;
+    border-radius: 50%;
+    background: white;
+    font-size: 60px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.new-post:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    background: black;
+}
+
+.new-post:active {
+    transform: scale(1.10);
+    background: #2b2b2b;
+    transition: 0.1s ease;
+}
+
+.new-post p {
+    margin: 0;
+    line-height: 1;
+}
+
+.new-post:hover p {
+    color: white;
+}
+
 .daily {
     display: flex;
     flex-direction: column;
@@ -95,7 +276,6 @@ html, body {
     padding: 0 20px;
     border: 2px solid black;
     border-radius: 30px;
-    cursor: pointer;
 }
 
 .daily-time {
@@ -115,4 +295,5 @@ html, body {
 .search img, .push img, .friends img, .chats img {
     width: 40px;
     height: 40px;
+    transition: filter 0.1s ease;
 }

@@ -4,12 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="31b7e6ac-349e-4882-87c2-9327fcede027" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/static/feed/images/comment.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/feed/images/default_avatar.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/feed/images/like.svg" afterDir="false" />
+    <list default="true" id="31b7e6ac-349e-4882-87c2-9327fcede027" name="Changes" comment="static feed design">
+      <change afterPath="$PROJECT_DIR$/static/feed/js/likes_and comments.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/feed/css/feed.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/feed/css/feed.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/feed/feed.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/feed/feed.html" afterDir="false" />
     </list>
@@ -21,8 +18,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="JavaScript File" />
         <option value="Python Script" />
+        <option value="JavaScript File" />
       </list>
     </option>
   </component>
@@ -35,12 +32,12 @@
     &quot;assignee&quot;: &quot;westside-jpg&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/westside-jpg/DayHob.git&quot;,
-    &quot;accountId&quot;: &quot;fa261acf-8818-4095-b0f4-bdd58893546c&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/westside-jpg/DayHob.git",
+    "accountId": "fa261acf-8818-4095-b0f4-bdd58893546c"
   }
-}</component>
+}]]></component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="QODANA_PROBLEMS_VIEW_TAB" />
   </component>
@@ -105,7 +102,8 @@
       <workItem from="1771291985581" duration="6243000" />
       <workItem from="1771821580883" duration="6307000" />
       <workItem from="1772346508459" duration="1953000" />
-      <workItem from="1772440628535" duration="7792000" />
+      <workItem from="1772440628535" duration="10449000" />
+      <workItem from="1775005802000" duration="11914000" />
     </task>
     <task id="LOCAL-00001" summary="first steps. main, databases, env, config, models">
       <option name="closed" value="true" />
@@ -227,7 +225,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772355432663</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="start design feed. static html + css. style left menu">
+      <option name="closed" value="true" />
+      <created>1772448683091</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1772448683091</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -250,6 +256,8 @@
     <MESSAGE value="make email code send" />
     <MESSAGE value="make jwt" />
     <MESSAGE value="add new tables to models.py, start write feed.html" />
-    <option name="LAST_COMMIT_MESSAGE" value="add new tables to models.py, start write feed.html" />
+    <MESSAGE value="start design feed. static html + css. style left menu" />
+    <MESSAGE value="static feed design" />
+    <option name="LAST_COMMIT_MESSAGE" value="static feed design" />
   </component>
 </project>
