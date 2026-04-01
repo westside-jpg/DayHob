@@ -13,7 +13,7 @@ app.include_router(auth_router)
 app.include_router(feed_router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-Base.metadata.drop_all(bind=sync_engine)
+# Base.metadata.drop_all(bind=sync_engine)
 Base.metadata.create_all(bind=sync_engine)
 
 @app.get("/")

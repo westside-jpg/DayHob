@@ -27,16 +27,16 @@ html, body {
     padding: 20px;
 }
 
-.search, .push, .friends, .chats, .profile {
+.search, .push, .friends, .chats, .profile, .post-info-btn {
     transition: all 0.3s ease;
 }
 
-.search:hover, .push:hover, .friends:hover, .chats:hover, .profile:hover {
+.search:hover, .push:hover, .friends:hover, .chats:hover, .profile:hover, .post-info-btn:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-.search:active, .push:active, .friends:active, .chats:active, .profile:active {
+.search:active, .push:active, .friends:active, .chats:active, .profile:active, .post-info-btn:active {
     transform: scale(1.10);
     background: black;
     transition: 0.1s ease;
@@ -47,8 +47,8 @@ html, body {
     filter: invert(1);
 }
 
-.avatar {
-    z-index: auto;
+.profile:active img.avatar {
+    filter: none;
 }
 
 .logo {
