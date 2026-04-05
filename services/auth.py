@@ -113,7 +113,27 @@ def send_verification_email(email: str, code: str):
     msg["To"] = email
     msg["Subject"] = "Подтверждение почты — DayHob"
 
-    body = f"<p>Ваш код подтверждения: <b>{code}</b></p><p>Не передавайте его никому.</p>"
+    body = f"""
+    <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px; background: #ffffff;">
+
+        <div style="text-align: center; margin-bottom: 40px;">
+            <p style="font-size: 42px; font-weight: 900; letter-spacing: -2px; margin: 0;">DayHob</p>
+        </div>
+
+        <div style="border: 2px solid #000; border-radius: 24px; padding: 40px; text-align: center;">
+            <p style="font-size: 18px; font-weight: 600; margin: 0 0 8px 0;">Подтверждение почты</p>
+            <p style="font-size: 14px; color: #888; margin: 0 0 32px 0;">Введите этот код на странице подтверждения</p>
+
+            <div style="background: #f5f5f5; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+                <p style="font-size: 48px; font-weight: 700; letter-spacing: 12px; margin: 0;">{code}</p>
+            </div>
+
+            <p style="font-size: 13px; color: #aaa; margin: 0;">Не передавайте код никому. Если вы не регистрировались — просто проигнорируйте письмо.</p>
+        </div>
+
+        <p style="text-align: center; font-size: 12px; color: #ccc; margin-top: 24px;">DayHob — живи каждый день</p>
+    </div>
+    """
     msg.attach(MIMEText(body, "html"))
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:

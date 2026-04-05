@@ -4,24 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="31b7e6ac-349e-4882-87c2-9327fcede027" name="Changes" comment="add html/css files for menu tabs. start making search page">
-      <change afterPath="$PROJECT_DIR$/add-post.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/feed.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/feed/css/chats.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/feed/css/friends.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/feed/css/profile.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/feed/css/push.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/feed/css/search.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/feed/chats.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/feed/friends.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/feed/profile.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/feed/push.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/feed/search.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="31b7e6ac-349e-4882-87c2-9327fcede027" name="Changes" comment="finish static feed">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routers/feed.py" beforeDir="false" afterPath="$PROJECT_DIR$/routers/feed.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/feed/css/feed.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/feed/css/feed.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/feed/feed.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/feed/feed.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
