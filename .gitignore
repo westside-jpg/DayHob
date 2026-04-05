@@ -19,3 +19,7 @@ env/
 .idea/vcs.xml
 .idea/profiles_settings.xml
 BooRing.iml
+
+# Файлы
+seed.py
+add-post.py

@@ -4,10 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="31b7e6ac-349e-4882-87c2-9327fcede027" name="Changes" comment="static feed design">
+    <list default="true" id="31b7e6ac-349e-4882-87c2-9327fcede027" name="Changes" comment="finish static feed">
+      <change afterPath="$PROJECT_DIR$/add-post.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/seed.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/feed.py" beforeDir="false" afterPath="$PROJECT_DIR$/routers/feed.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/feed/css/feed.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/feed/css/feed.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/feed/js/likes_and comments.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/feed/js/likes_and_comments.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/feed/feed.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/feed/feed.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,8 +21,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="JavaScript File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -52,8 +56,10 @@
   &quot;keyToString&quot;: {
     &quot;JavaScript Debug.index.html.executor&quot;: &quot;Run&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.add-post.executor&quot;: &quot;Run&quot;,
     &quot;Python.auth.executor&quot;: &quot;Run&quot;,
     &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.seed.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
@@ -75,11 +81,11 @@
       <recent name="$PROJECT_DIR$/templates/auth" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/static/feed/css" />
       <recent name="$PROJECT_DIR$/static/auth/js" />
       <recent name="$PROJECT_DIR$/static/auth/css" />
       <recent name="$PROJECT_DIR$/static/auth" />
-      <recent name="$PROJECT_DIR$/static" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -102,7 +108,8 @@
       <workItem from="1771821580883" duration="6307000" />
       <workItem from="1772346508459" duration="1953000" />
       <workItem from="1772440628535" duration="10449000" />
-      <workItem from="1775005802000" duration="12928000" />
+      <workItem from="1775005802000" duration="13065000" />
+      <workItem from="1775352492137" duration="3459000" />
     </task>
     <task id="LOCAL-00001" summary="first steps. main, databases, env, config, models">
       <option name="closed" value="true" />
@@ -248,7 +255,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775036189688</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="finish static feed">
+      <option name="closed" value="true" />
+      <created>1775037139115</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1775037139115</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -274,6 +289,7 @@
     <MESSAGE value="start design feed. static html + css. style left menu" />
     <MESSAGE value="static feed design" />
     <MESSAGE value="add filled like svg" />
-    <option name="LAST_COMMIT_MESSAGE" value="add filled like svg" />
+    <MESSAGE value="finish static feed" />
+    <option name="LAST_COMMIT_MESSAGE" value="finish static feed" />
   </component>
 </project>

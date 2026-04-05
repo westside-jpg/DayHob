@@ -40,33 +40,37 @@
     </div>
     <div class="feed">
         <div class="task">
-            <p>Сделать дело, которое постоянно откладывал</p>
+            <p>{{ task.title if task else "Задания на сегодня нет" }}</p>
         </div>
         <div class="posts">
+            {% for post in posts %}
             <div class="post-wrapper">
                 <div class="post">
                     <div class="post-header">
                         <img class="post-avatar" src="/static/feed/images/default_avatar.svg" alt="">
                         <div class="post-user-info">
-                            <p class="post-username">danya</p>
-                            <p class="post-time">1 час назад</p>
+                            <p class="post-username">{{ post.author_username }}</p>
+                            <p class="post-time">{{ post.created_at }} </p>
                         </div>
                         <p class="post-info-btn">i</p>
                     </div>
-                    <img class="post-image" src="https://placehold.co/600x400" alt="">
-                    <p class="post-text">Все говорили, что заводить дружбу с тигром — плохая идея...</p>
+                    {% if post.image_url %}
+                    <img class="post-image" src="{{ post.image_url }}" alt="">
+                    {% endif %}
+                    <p class="post-text">{{ post.text }}</p>
                 </div>
                 <div class="post-footer">
                     <div class="like">
                         <img src="/static/feed/images/like.svg" alt="" class="like-icon">
-                        <p>20K</p>
+                        <p>{{ post.likes_count }}</p>
                     </div>
                     <div class="comment">
                         <img src="/static/feed/images/comment.svg" alt="" class="comment-icon">
-                        <p>132</p>
+                        <p>{{ post.comments_count }}</p>
                     </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
     </div>
     <div class="add-post">
@@ -75,6 +79,6 @@
         </button>
         <p>Создать пост</p>
     </div>
-    <script src="../../static/feed/js/likes_and comments.js"></script>
+    <script src="../../static/feed/js/likes_and_comments.js"></script>
 </body>
 </html>

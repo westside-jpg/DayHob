@@ -297,3 +297,7 @@ html, body {
     height: 40px;
     transition: filter 0.1s ease;
 }
+
+.post-wrapper {
+    margin-bottom: 40px;
+}
