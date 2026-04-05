@@ -23,3 +23,6 @@ BooRing.iml
 # Файлы
 seed.py
 add-post.py
+
+# Мусор из OC
+.DS_Store

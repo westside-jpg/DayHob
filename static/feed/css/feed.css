@@ -33,7 +33,7 @@ body {
     overflow-y: auto;
 }
 
-.search, .push, .friends, .chats, .profile, .post-info-btn {
+.search, .push, .friends, .chats, .profile, .post-info-btn, .logo {
     transition: all 0.3s ease;
 }
 
@@ -42,11 +42,20 @@ body {
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
+.logo:hover {
+    transform: scale(1.05);
+}
+
 .search:active, .push:active, .friends:active, .chats:active, .profile:active, .post-info-btn:active {
     transform: scale(1.10);
     background: black;
     transition: 0.1s ease;
     color: white;
+}
+
+.logo:active {
+    transform: scale(1.10);
+    transition: 0.1s ease;
 }
 
 .search:active img, .push:active img, .friends:active img, .chats:active img, .profile:active img {
@@ -159,15 +168,15 @@ body {
 }
 
 .comment img {
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
     transition: filter 0.2s ease;
     cursor: pointer;
 }
 
 .like img {
-    width: 36px;
-    height: 36px;
+    width: 27px;
+    height: 27px;
     transition: filter 0.2s ease;
     cursor: pointer;
 }
@@ -210,7 +219,7 @@ body {
 }
 
 .like p, .comment p {
-    font-size: 30px;
+    font-size: 23px;
     font-weight: 500;
     margin: 0;
 }
@@ -308,4 +317,9 @@ body {
 
 .post-wrapper {
     margin-bottom: 40px;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
 }

@@ -1,0 +1,128 @@
+html, body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.menu {
+    width: 350px;
+    min-width: 300px;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.search, .push, .friends, .chats, .profile, .post-info-btn, .logo {
+    transition: all 0.3s ease;
+}
+
+.search {
+    background: black;
+}
+.search:hover, .push:hover, .friends:hover, .chats:hover, .profile:hover, .post-info-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
+.search:active, .push:active, .friends:active, .chats:active, .profile:active, .post-info-btn:active {
+    transform: scale(1.10);
+    background: black;
+    transition: 0.1s ease;
+    color: white;
+}
+
+.logo:active {
+    transform: scale(1.10);
+    transition: 0.1s ease;
+}
+
+.search:active img, .push:active img, .friends:active img, .chats:active img, .profile:active img {
+    filter: invert(1);
+}
+
+.profile:active img.avatar {
+    filter: none;
+}
+
+.logo {
+    width: 100px;
+    display: block;
+    margin: 0 auto;
+    padding-bottom: 10px;
+}
+
+.search, .push, .friends, .chats, .profile {
+    height: 80px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px;
+    border: 2px solid black;
+    border-radius: 30px;
+    cursor: pointer;
+}
+
+.menu-text {
+    font-size: 30px;
+    padding-left: 10px;
+    font-weight: 500;
+}
+
+.search .menu-text {
+    color: white;
+}
+
+.search img {
+    filter: invert(1);
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.daily {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+    padding: 0 20px;
+    border: 2px solid black;
+    border-radius: 30px;
+}
+
+.daily-time {
+    font-size: 60px;
+    font-weight: 700;
+    margin: 0;
+    padding-top: 5px;
+}
+
+.daily-label {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 0;
+    padding-bottom: 15px;
+}
+
+.search img, .push img, .friends img, .chats img {
+    width: 40px;
+    height: 40px;
+    transition: filter 0.1s ease;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}

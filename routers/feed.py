@@ -1,13 +1,12 @@
 from datetime import date
-
 from fastapi import APIRouter, Request, Form, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
-
 from models import Tasks, Posts, Users
 from database import session_factory
 from services.dependencies import get_current_user
+from services.feed import time_ago, time_until_next_day
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -31,7 +30,7 @@ def feed_page_get(request: Request, current_user = Depends(get_current_user)):
         for post, author in rows:
             posts.append({
                 "id": post.id,
-                "created_at": post.created_at,
+                "created_at": time_ago(post.created_at),
                 "image_url": post.image_url,
                 "text": post.text,
                 "task_id": post.task_id,
@@ -45,10 +44,17 @@ def feed_page_get(request: Request, current_user = Depends(get_current_user)):
             "request": request,
             "task": task,
             "posts": posts,
-            "user": current_user
+            "user": current_user,
+            "time_until": time_until_next_day()
         })
 
-    return templates.TemplateResponse("feed/feed.html", {
+@router.get("/search", response_class=HTMLResponse)
+def search_page_get(request: Request, current_user = Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    return templates.TemplateResponse("feed/search.html", {
         "request": request,
-        "user": current_user
+        "user": current_user,
+        "time_until": time_until_next_day()
     })

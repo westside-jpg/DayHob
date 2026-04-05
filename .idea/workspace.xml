@@ -4,13 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="31b7e6ac-349e-4882-87c2-9327fcede027" name="Changes" comment="finish static feed">
+    <list default="true" id="31b7e6ac-349e-4882-87c2-9327fcede027" name="Changes" comment="add html/css files for menu tabs. start making search page">
       <change afterPath="$PROJECT_DIR$/add-post.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/seed.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/feed.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/feed/css/chats.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/feed/css/friends.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/feed/css/profile.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/feed/css/push.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/feed/css/search.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/feed/chats.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/feed/friends.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/feed/profile.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/feed/push.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/feed/search.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routers/feed.py" beforeDir="false" afterPath="$PROJECT_DIR$/routers/feed.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/feed/css/feed.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/feed/css/feed.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/feed/js/likes_and comments.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/feed/js/likes_and_comments.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/feed/feed.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/feed/feed.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -23,6 +33,7 @@
       <list>
         <option value="JavaScript File" />
         <option value="Python Script" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -38,7 +49,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/westside-jpg/DayHob.git&quot;,
-    &quot;accountId&quot;: &quot;fa261acf-8818-4095-b0f4-bdd58893546c&quot;
+    &quot;accountId&quot;: &quot;5eacd1fb-fb61-4125-84aa-fa907b0ce898&quot;
   }
 }</component>
   <component name="ProblemsViewState">
@@ -54,6 +65,7 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
     &quot;JavaScript Debug.index.html.executor&quot;: &quot;Run&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;Python.add-post.executor&quot;: &quot;Run&quot;,
@@ -91,7 +103,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-WS-252.25557.126" />
+        <option value="bundled-python-sdk-ce6832f46686-7b97d883f26b-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.25557.178" />
       </set>
     </attachedChunks>
   </component>
@@ -109,7 +121,7 @@
       <workItem from="1772346508459" duration="1953000" />
       <workItem from="1772440628535" duration="10449000" />
       <workItem from="1775005802000" duration="13065000" />
-      <workItem from="1775352492137" duration="3459000" />
+      <workItem from="1775352492137" duration="4376000" />
     </task>
     <task id="LOCAL-00001" summary="first steps. main, databases, env, config, models">
       <option name="closed" value="true" />
@@ -263,7 +275,23 @@
       <option name="project" value="LOCAL" />
       <updated>1775037139115</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="make menu and create post button in feed stuck">
+      <option name="closed" value="true" />
+      <created>1775359488100</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1775359488100</updated>
+    </task>
+    <task id="LOCAL-00021" summary="add html/css files for menu tabs. start making search page">
+      <option name="closed" value="true" />
+      <created>1775368390431</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1775368390431</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -290,6 +318,8 @@
     <MESSAGE value="static feed design" />
     <MESSAGE value="add filled like svg" />
     <MESSAGE value="finish static feed" />
-    <option name="LAST_COMMIT_MESSAGE" value="finish static feed" />
+    <MESSAGE value="make menu and create post button in feed stuck" />
+    <MESSAGE value="add html/css files for menu tabs. start making search page" />
+    <option name="LAST_COMMIT_MESSAGE" value="add html/css files for menu tabs. start making search page" />
   </component>
 </project>

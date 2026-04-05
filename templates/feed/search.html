@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Лента</title>
-    <link rel="stylesheet" href="../../static/feed/css/feed.css">
+    <title>Поиск</title>
+    <link rel="stylesheet" href="../../static/feed/css/search.css">
     <link rel="shortcut icon" href="../../static/feed/images/logo.svg" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,47 +50,14 @@
             </div>
         </a>
     </div>
-    <div class="feed">
-        <div class="task">
-            <p>{{ task.title if task else "Задания на сегодня нет" }}</p>
-        </div>
-        <div class="posts">
-            {% for post in posts %}
-            <div class="post-wrapper">
-                <div class="post">
-                    <div class="post-header">
-                        <img class="post-avatar" src="{{ post.author_avatar or '/static/feed/images/default_avatar.svg' }}" alt="">
-                        <div class="post-user-info">
-                            <p class="post-username">{{ post.author_username }}</p>
-                            <p class="post-time">{{ post.created_at }} </p>
-                        </div>
-                        <p class="post-info-btn">i</p>
-                    </div>
-                    {% if post.image_url %}
-                    <img class="post-image" src="{{ post.image_url }}" alt="">
-                    {% endif %}
-                    <p class="post-text">{{ post.text }}</p>
-                </div>
-                <div class="post-footer">
-                    <div class="like">
-                        <img src="/static/feed/images/like.svg" alt="" class="like-icon">
-                        <p>{{ post.likes_count }}</p>
-                    </div>
-                    <div class="comment">
-                        <img src="/static/feed/images/comment.svg" alt="" class="comment-icon">
-                        <p>{{ post.comments_count }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
+    <div class="search-input">
+            <input placeholder="Начните вводить имя..." type="text" name="password">
+    </div>
+    <div class="search-result">
+        <div class="result">
+            <img class="result-avatar" src="/static/feed/images/default_avatar.svg" alt="">
+            <p class="result-name">Mark-Bill</p>
         </div>
     </div>
-    <div class="add-post">
-        <button class="new-post">
-            <p>+</p>
-        </button>
-        <p>Создать пост</p>
-    </div>
-    <script src="../../static/feed/js/likes_and_comments.js"></script>
 </body>
 </html>
