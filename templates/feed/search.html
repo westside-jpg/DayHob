@@ -50,14 +50,25 @@
             </div>
         </a>
     </div>
-    <div class="search-input">
-            <input placeholder="Начните вводить имя..." type="text" name="password">
-    </div>
-    <div class="search-result">
-        <div class="result">
-            <img class="result-avatar" src="/static/feed/images/default_avatar.svg" alt="">
-            <p class="result-name">Mark-Bill</p>
+    <div class="content">
+        <div class="search-input">
+            <input placeholder="Начните вводить имя..." type="text">
         </div>
+        {% if results %}
+            <div class="search-result">
+                {% for result in results %}
+                <div class="result">
+                    <img class="result-avatar" src="{{ result.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="">
+                    <p class="result-name">{{ result.username }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+        <div class="not-found">
+            <p>Таких пользователей не найдено</p>
+        </div>
+        {% endif %}
     </div>
+    <script src="/static/feed/js/search.js"></script>
 </body>
 </html>

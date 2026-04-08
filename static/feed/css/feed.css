@@ -248,6 +248,7 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 10px;
+    margin-right: 70px;
 }
 
 .new-post {

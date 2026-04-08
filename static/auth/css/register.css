@@ -129,6 +129,7 @@ html, body {
 }
 
 .text {
+    display: block;
     padding-left: clamp(5px, 2vw, 15px);
     font-size: clamp(14px, 3vw, 18px);
     margin: 0 0 5px 0;
