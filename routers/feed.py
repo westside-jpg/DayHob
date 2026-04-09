@@ -73,7 +73,6 @@ def search_page_get(request: Request, current_user = Depends(get_current_user)):
         "results": results
     })
 
-
 @router.get("/search/users")
 def search_users(query: str, current_user=Depends(get_current_user)):
     if not current_user:
@@ -88,3 +87,4 @@ def search_users(query: str, current_user=Depends(get_current_user)):
         ).scalars().all()
 
         return [{"username": u.username, "avatar_url": u.avatar_url} for u in users]
+

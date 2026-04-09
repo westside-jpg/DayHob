@@ -18,10 +18,11 @@ Base.metadata.create_all(bind=sync_engine)
 
 @app.exception_handler(404)
 def not_found_handler(request: Request, exc):
-    return templates.TemplateResponse("errors/error-404.html",
-                                      {"request": request},
-                                      status_code=404
-                                      )
+    return templates.TemplateResponse(
+        "errors/error-404.html",
+        {"request": request},
+        status_code=404
+    )
 
 @app.get("/")
 def home(request: Request):

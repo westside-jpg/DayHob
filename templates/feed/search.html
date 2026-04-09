@@ -57,10 +57,12 @@
         {% if results %}
             <div class="search-result">
                 {% for result in results %}
-                <div class="result">
-                    <img class="result-avatar" src="{{ result.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="">
-                    <p class="result-name">{{ result.username }}</p>
-                </div>
+                <a href="/profile/{{ result.username }}">
+                    <div class="result">
+                        <img class="result-avatar" src="{{ result.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="">
+                        <p class="result-name">{{ result.username }}</p>
+                    </div>
+                </a>
                 {% endfor %}
             </div>
         {% else %}

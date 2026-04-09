@@ -4,16 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="31b7e6ac-349e-4882-87c2-9327fcede027" name="Changes" comment="change mail design">
-      <change afterPath="$PROJECT_DIR$/static/errors/error-404.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/feed/js/search.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/errors/error-404.html" afterDir="false" />
+    <list default="true" id="31b7e6ac-349e-4882-87c2-9327fcede027" name="Changes" comment="So much things...&#10;1. Add error 404 handler&#10;2. Add links to all menu tabs in feed and search&#10;3. Make search tab and dynamic results depending on type&#10;4. Change margin on register page.  Text above inputs fields is higher">
+      <change afterPath="$PROJECT_DIR$/static/feed/images/test-photo.jpeg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/add-post.py" beforeDir="false" afterPath="$PROJECT_DIR$/add-post.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routers/feed.py" beforeDir="false" afterPath="$PROJECT_DIR$/routers/feed.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/auth/css/register.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/auth/css/register.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/feed/css/feed.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/feed/css/feed.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/feed/css/search.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/feed/css/search.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/feed/css/profile.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/feed/css/profile.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/feed/profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/feed/profile.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/feed/search.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/feed/search.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -116,6 +115,8 @@
       <workItem from="1775005802000" duration="13065000" />
       <workItem from="1775352492137" duration="4376000" />
       <workItem from="1775643488391" duration="3154000" />
+      <workItem from="1775736569514" duration="6588000" />
+      <workItem from="1775743288785" duration="8000" />
     </task>
     <task id="LOCAL-00001" summary="first steps. main, databases, env, config, models">
       <option name="closed" value="true" />
@@ -293,7 +294,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775386997939</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="So much things...&#10;1. Add error 404 handler&#10;2. Add links to all menu tabs in feed and search&#10;3. Make search tab and dynamic results depending on type&#10;4. Change margin on register page.  Text above inputs fields is higher">
+      <option name="closed" value="true" />
+      <created>1775651183441</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1775651183441</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -323,6 +332,7 @@
     <MESSAGE value="make menu and create post button in feed stuck" />
     <MESSAGE value="add html/css files for menu tabs. start making search page" />
     <MESSAGE value="change mail design" />
-    <option name="LAST_COMMIT_MESSAGE" value="change mail design" />
+    <MESSAGE value="So much things...&#10;1. Add error 404 handler&#10;2. Add links to all menu tabs in feed and search&#10;3. Make search tab and dynamic results depending on type&#10;4. Change margin on register page.  Text above inputs fields is higher" />
+    <option name="LAST_COMMIT_MESSAGE" value="So much things...&#10;1. Add error 404 handler&#10;2. Add links to all menu tabs in feed and search&#10;3. Make search tab and dynamic results depending on type&#10;4. Change margin on register page.  Text above inputs fields is higher" />
   </component>
 </project>
