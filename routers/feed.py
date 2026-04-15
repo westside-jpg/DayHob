@@ -3,7 +3,7 @@ from fastapi import APIRouter, Request, Form, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
-from models import Tasks, Posts, Users
+from models import Tasks, Posts, Users, Likes, Comments, Followers
 from database import session_factory
 from services.dependencies import get_current_user
 from services.feed import time_ago, time_until_next_day
@@ -88,3 +88,47 @@ def search_users(query: str, current_user=Depends(get_current_user)):
 
         return [{"username": u.username, "avatar_url": u.avatar_url} for u in users]
 
+@router.get("/profile/{username}")
+def profile_page_get(request: Request, username: str, current_user = Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    if username == current_user.username:
+        ...
+    else:
+        with session_factory() as session:
+            stranger = session.execute(
+                select(Users, Posts, Likes, Comments, Tasks).join(
+                    Users,
+                    Posts.user_id == Users.id,
+                    Likes.post_id == Posts.id,
+                    Tasks.id == Posts.task_id,
+                    Comments.post_id == Posts.id,
+                )
+            ).where().scalar_one_or_none()
+
+            if not stranger:
+                return RedirectResponse("/404", status_code=303)
+
+            results = []
+            for result in stranger:
+                results.append({
+                    "request": request,
+                    "avatar_url": result.avatar_url,
+                    "username": result.username,
+                    "bio": result.bio,
+                    "friends": ...,
+                    "subs": ...,
+                    "task_id": result.task_id,
+                    "post_text": result.text,
+                    "likes_count": ...,
+                    "comments_count": ...,
+                    "created_at": time_ago(result.created_at),
+                })
+
+            return templates.TemplateResponse("feed/profile.html", {
+                "request": request,
+                "user": current_user,
+                "results": results,
+                "time_until": time_until_next_day()
+            })

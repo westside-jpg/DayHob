@@ -40,15 +40,22 @@
             </div>
         </a>
         <div class="daily">
-            <p class="daily-time">{{ time_until }}</p>
+            <p class="daily-time">13:32</p>
             <p class="daily-label">ДО СЛЕДУЮЩЕГО ДЕЙЛА</p>
         </div>
-        <a href="/profile">
-            <div class="profile">
-                <img src="{{ user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="avatar">
-                <p class="menu-text">{{ user.username }}</p>
-            </div>
-        </a>
+        <div class="profile-and-settings">
+            <a href="/profile">
+                <div class="profile">
+                    <img src="/static/feed/images/test-photo.jpeg" alt="" class="avatar">
+                    <p class="menu-text">danya</p>
+                </div>
+            </a>
+            <a href="/settings">
+                <div class="settings">
+                    <img src="../../static/feed/images/settings.svg" alt="">
+                </div>
+            </a>
+        </div>
     </div>
     <div class="user-profile">
         <div class="head">
