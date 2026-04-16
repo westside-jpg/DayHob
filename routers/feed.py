@@ -3,6 +3,9 @@ from fastapi import APIRouter, Request, Form, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
+from sqlalchemy.orm import aliased
+from sqlalchemy.sql.expression import and_
+from sqlalchemy.sql.functions import func
 from models import Tasks, Posts, Users, Likes, Comments, Followers
 from database import session_factory
 from services.dependencies import get_current_user
@@ -93,42 +96,99 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
-    if username == current_user.username:
-        ...
-    else:
-        with session_factory() as session:
-            stranger = session.execute(
-                select(Users, Posts, Likes, Comments, Tasks).join(
-                    Users,
-                    Posts.user_id == Users.id,
-                    Likes.post_id == Posts.id,
-                    Tasks.id == Posts.task_id,
-                    Comments.post_id == Posts.id,
+    with session_factory() as session:
+        # Профиль
+        profile_user = session.execute(
+            select(Users).where(Users.username == username)
+        ).scalar_one_or_none()
+
+        if not profile_user:
+            return RedirectResponse("/404", status_code=303)
+
+        # Определение флагов
+        is_own_profile = (current_user.id == profile_user.id)
+        is_following = False
+        if not is_own_profile:
+            is_following = session.execute(
+                select(Followers).where(
+                    Followers.follower_id == current_user.id,
+                    Followers.following_id == profile_user.id
                 )
-            ).where().scalar_one_or_none()
+            ).scalar_one_or_none() is not None
 
-            if not stranger:
-                return RedirectResponse("/404", status_code=303)
+        # Посты
+        likes_subq = (
+            select(Likes.post_id, func.count().label("likes_count"))
+            .group_by(Likes.post_id)
+            .subquery()
+        )
 
-            results = []
-            for result in stranger:
-                results.append({
-                    "request": request,
-                    "avatar_url": result.avatar_url,
-                    "username": result.username,
-                    "bio": result.bio,
-                    "friends": ...,
-                    "subs": ...,
-                    "task_id": result.task_id,
-                    "post_text": result.text,
-                    "likes_count": ...,
-                    "comments_count": ...,
-                    "created_at": time_ago(result.created_at),
-                })
+        comments_subq = (
+            select(Comments.post_id, func.count().label("comments_count"))
+            .group_by(Comments.post_id)
+            .subquery()
+        )
 
-            return templates.TemplateResponse("feed/profile.html", {
-                "request": request,
-                "user": current_user,
-                "results": results,
-                "time_until": time_until_next_day()
+        posts_query = (
+            select(
+                Posts,
+                func.coalesce(likes_subq.c.likes_count, 0).label("likes_count"),
+                func.coalesce(comments_subq.c.comments_count, 0).label("comments_count"),
+            )
+            .outerjoin(likes_subq, likes_subq.c.post_id == Posts.id)
+            .outerjoin(comments_subq, comments_subq.c.post_id == Posts.id)
+            .where(Posts.user_id == profile_user.id)
+            .order_by(Posts.created_at.desc())
+        )
+
+        rows = session.execute(posts_query).all()
+
+        posts_data = []
+
+        for post, likes_count, comments_count in rows:
+            posts_data.append({
+                "task_id": post.task_id,
+                "image_url": post.image_url,
+                "post_text": post.text,
+                "likes_count": likes_count,
+                "comments_count": comments_count,
+                "created_at": time_ago(post.created_at)
             })
+
+        # Статистика
+        posts_count = session.execute(
+            select(func.count()).where(Posts.user_id == profile_user.id)
+        ).scalar()
+
+        followers_count = session.execute(
+            select(func.count()).where(Followers.following_id == profile_user.id)
+        ).scalar()
+
+        f1 = aliased(Followers)
+        f2 = aliased(Followers)
+
+        friends_count = session.execute(
+            select(func.count())
+            .select_from(f1)
+            .join(
+                f2,
+                and_(
+                    f1.following_id == f2.follower_id,
+                    f2.following_id == profile_user.id
+                )
+            )
+            .where(f1.follower_id == profile_user.id)
+        ).scalar()
+
+        return templates.TemplateResponse("feed/profile.html", {
+            "request": request,
+            "current_user": current_user,
+            "profile_user": profile_user,
+            "is_own_profile": is_own_profile,
+            "is_following": is_following,
+            "posts": posts_data,
+            "posts_count": posts_count,
+            "followers_count": followers_count,
+            "friends_count": friends_count,
+            "time_until": time_until_next_day()
+        })

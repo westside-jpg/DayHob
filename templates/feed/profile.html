@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профиль</title>
+    <title>{{ profile_user.username }}</title>
     <link rel="stylesheet" href="../../static/feed/css/profile.css">
     <link rel="shortcut icon" href="../../static/feed/images/logo.svg" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,69 +40,85 @@
             </div>
         </a>
         <div class="daily">
-            <p class="daily-time">13:32</p>
+            <p class="daily-time">{{ time_until }}</p>
             <p class="daily-label">ДО СЛЕДУЮЩЕГО ДЕЙЛА</p>
         </div>
         <div class="profile-and-settings">
-            <a href="/profile">
-                <div class="profile">
-                    <img src="/static/feed/images/test-photo.jpeg" alt="" class="avatar">
-                    <p class="menu-text">danya</p>
+            <a href="/profile/{{ current_user.username }}">
+                <div class="profile {% if is_own_profile %}own{% endif %}">
+                    <img src="{{ current_user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="avatar">
+                    <p class="menu-text">{{ current_user.username }}</p>
                 </div>
             </a>
-            <a href="/settings">
+            {% if is_own_profile %}
+            <a href="/settings/{{ current_user.username }}">
                 <div class="settings">
                     <img src="../../static/feed/images/settings.svg" alt="">
                 </div>
             </a>
+            {% endif %}
         </div>
     </div>
     <div class="user-profile">
         <div class="head">
-            <img src="/static/feed/images/test-photo.jpeg" alt="" class="user-avatar">
-            <p class="username">danya</p>
-            <p class="bio">Дизайнер из Лос-Анжелеса Коуч по духовной силе Диджей на привелигированной яхте</p>
-            <button class="follow-btn">Подписаться</button>
+            <img src="{{ profile_user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="user-avatar">
+            <p class="username">{{ profile_user.username }}</p>
+            {% if profile_user.bio %}
+                <p class="bio">{{ profile_user.bio }}</p>
+            {% endif %}
+            {% if not is_own_profile %}
+                {% if not is_following %}
+                <button class="follow-btn">Подписаться</button>
+                {% else %}
+                <button class="follow-btn">Отписаться</button>
+                {% endif %}
+            {% endif %}
             <div class="stats">
                 <div class="stats-item">
-                    <p class="stats-number">124<br></p>
+                    <p class="stats-number">{{ friends_count }}<br></p>
                     <p class="stats-category">друга</p>
                 </div>
                 <div class="stats-item">
-                    <p class="stats-number">2435<br></p>
+                    <p class="stats-number">{{ followers_count }}<br></p>
                     <p class="stats-category">саба</p>
                 </div>
                 <div class="stats-item">
-                    <p class="stats-number">3<br></p>
+                    <p class="stats-number">{{ posts_count }}<br></p>
                     <p class="stats-category">поста</p>
                 </div>
             </div>
         </div>
         <div class="posts">
+            {% for post in posts %}
             <div class="post-wrapper">
                 <div class="post">
                     <div class="post-header">
-                        <img class="post-avatar" src="/static/feed/images/default_avatar.svg" alt="">
+                        <img class="post-avatar" src="{{ profile_user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="">
                         <div class="post-user-info">
-                            <p class="post-username">danya</p>
-                            <p class="post-time">2 ч. назад</p>
+                            <p class="post-username">{{ profile_user.username }}</p>
+                            <p class="post-time">{{ post.created_at }}</p>
                         </div>
                         <p class="post-info-btn">i</p>
                     </div>
-                    <img class="post-image" src="/static/feed/images/test-photo.jpeg" alt="">
-                    <p class="post-text">Всем привет! Как у вас дела?</p>
+                    {% if post.image_url %}
+                        <img class="post-image" src="{{ post.image_url }}" alt="">
+                    {% endif %}
+                    {% if post.post_text %}
+                        <p class="post-text">{{ post.post_text }}</p>
+                    {% endif %}
                 </div>
                 <div class="post-footer">
                     <div class="like">
                         <img src="/static/feed/images/like.svg" alt="" class="like-icon">
-                        <p>20</p>
+                        <p>{{ post.likes_count }}</p>
                     </div>
                     <div class="comment">
                         <img src="/static/feed/images/comment.svg" alt="" class="comment-icon">
-                        <p>30</p>
+                        <p>{{ post.comments_count }}</p>
                     </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
     </div>
 </body>

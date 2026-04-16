@@ -8,7 +8,7 @@
     <link rel="shortcut icon" href="../../static/feed/images/logo.svg" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="menu">
@@ -43,7 +43,7 @@
             <p class="daily-time">{{ time_until }}</p>
             <p class="daily-label">ДО СЛЕДУЮЩЕГО ДЕЙЛА</p>
         </div>
-        <a href="/profile">
+        <a href="/profile/{{ user.username }}">
             <div class="profile">
                 <img src="{{ user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="avatar">
                 <p class="menu-text">{{ user.username }}</p>

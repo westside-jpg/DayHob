@@ -8,7 +8,7 @@
     <link rel="shortcut icon" href="../../static/feed/images/logo.svg" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="menu">
@@ -43,7 +43,7 @@
             <p class="daily-time">{{ time_until }}</p>
             <p class="daily-label">ДО СЛЕДУЮЩЕГО ДЕЙЛА</p>
         </div>
-        <a href="/profile">
+        <a href="/profile/{{ user.username }}">
             <div class="profile">
                 <img src="{{ user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="avatar">
                 <p class="menu-text">{{ user.username }}</p>
@@ -59,17 +59,23 @@
             <div class="post-wrapper">
                 <div class="post">
                     <div class="post-header">
-                        <img class="post-avatar" src="{{ post.author_avatar or '/static/feed/images/default_avatar.svg' }}" alt="">
+                        <a href="/profile/{{ post.author_username }}">
+                            <img class="post-avatar" src="{{ post.author_avatar or '/static/feed/images/default_avatar.svg' }}" alt="">
+                        </a>
                         <div class="post-user-info">
-                            <p class="post-username">{{ post.author_username }}</p>
+                            <a href="/profile/{{ post.author_username }}">
+                                <p class="post-username">{{ post.author_username }}</p>
+                            </a>
                             <p class="post-time">{{ post.created_at }} </p>
                         </div>
                         <p class="post-info-btn">i</p>
                     </div>
                     {% if post.image_url %}
-                    <img class="post-image" src="{{ post.image_url }}" alt="">
+                        <img class="post-image" src="{{ post.image_url }}" alt="">
                     {% endif %}
-                    <p class="post-text">{{ post.text }}</p>
+                    {% if post.text %}
+                        <p class="post-text">{{ post.text }}</p>
+                    {% endif %}
                 </div>
                 <div class="post-footer">
                     <div class="like">
