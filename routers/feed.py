@@ -9,7 +9,8 @@ from sqlalchemy.sql.functions import func
 from models import Tasks, Posts, Users, Likes, Comments, Followers
 from database import session_factory
 from services.dependencies import get_current_user
-from services.feed import time_ago, time_until_next_day
+from services.feed import time_ago, time_until_next_day, declination_friends, declination_subs, declination_posts, \
+    cut_numbers
 from fastapi.responses import JSONResponse
 
 router = APIRouter()
@@ -150,8 +151,8 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
                 "task_id": post.task_id,
                 "image_url": post.image_url,
                 "post_text": post.text,
-                "likes_count": likes_count,
-                "comments_count": comments_count,
+                "likes_count": cut_numbers(likes_count),
+                "comments_count": cut_numbers(comments_count),
                 "created_at": time_ago(post.created_at)
             })
 
@@ -180,6 +181,12 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
             .where(f1.follower_id == profile_user.id)
         ).scalar()
 
+        declination = {
+            "posts": declination_posts(posts_count),
+            "subs": declination_subs(followers_count),
+            "friends": declination_friends(friends_count)
+        }
+
         return templates.TemplateResponse("feed/profile.html", {
             "request": request,
             "current_user": current_user,
@@ -187,8 +194,9 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
             "is_own_profile": is_own_profile,
             "is_following": is_following,
             "posts": posts_data,
-            "posts_count": posts_count,
-            "followers_count": followers_count,
-            "friends_count": friends_count,
+            "posts_count": cut_numbers(posts_count),
+            "followers_count": cut_numbers(followers_count),
+            "friends_count": cut_numbers(friends_count),
+            "declination": declination,
             "time_until": time_until_next_day()
         })

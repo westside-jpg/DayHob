@@ -33,3 +33,46 @@ def time_until_next_day():
     minutes = int((diff.total_seconds() % 3600) // 60)
 
     return f"{hours:02d}:{minutes:02d}"
+
+def cut_numbers(number):
+    if number >= 1_000_000:
+        return f"{number / 1_000_000:.1f}M"
+    if number >= 1_000:
+        return f"{number / 1_000:.1f}K"
+    return number
+
+def declination_subs(number):
+    n = abs(number)
+    if 11 <= n % 100 <= 14:
+        return "сабов"
+    last_digit = n % 10
+    if last_digit == 1:
+        return "саб"
+    elif 2 <= last_digit <= 4:
+        return "саба"
+    else:
+        return "сабов"
+
+def declination_friends(number):
+    n = abs(number)
+    if 11 <= n % 100 <= 14:
+        return "друзей"
+    last_digit = n % 10
+    if last_digit == 1:
+        return "друг"
+    elif 2 <= last_digit <= 4:
+        return "друга"
+    else:
+        return "друзей"
+
+def declination_posts(number):
+    n = abs(number)
+    if 11 <= n % 100 <= 14:
+        return "постов"
+    last_digit = n % 10
+    if last_digit == 1:
+        return "пост"
+    elif 2 <= last_digit <= 4:
+        return "поста"
+    else:
+        return "постов"
