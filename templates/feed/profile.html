@@ -98,7 +98,12 @@
                             <p class="post-username">{{ profile_user.username }}</p>
                             <p class="post-time">{{ post.created_at }}</p>
                         </div>
-                        <p class="post-info-btn">i</p>
+                        <div class="post-info">
+                            <p class="post-info-btn">i</p>
+                            <div class="post-tooltip">
+                                {{ post.task_title }}
+                            </div>
+                        </div>
                     </div>
                     {% if post.image_url %}
                         <img class="post-image" src="{{ post.image_url }}" alt="">
@@ -121,5 +126,7 @@
             {% endfor %}
         </div>
     </div>
+    <script src="../../static/feed/js/likes_and_comments.js"></script>
+    <script src="../../static/feed/js/task_info.js"></script>
 </body>
 </html>

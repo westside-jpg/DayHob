@@ -28,17 +28,20 @@ def feed_page_get(request: Request, current_user = Depends(get_current_user)):
         ).scalar_one_or_none()
 
         rows = session.execute(
-            select(Posts, Users).join(Users, Posts.user_id == Users.id)
+            select(Posts, Users, Tasks)
+            .join(Users, Posts.user_id == Users.id)
+            .join(Tasks, Posts.task_id == Tasks.id)
         ).all()
 
         posts = []
-        for post, author in rows:
+        for post, author, task_i in rows:
             posts.append({
                 "id": post.id,
                 "created_at": time_ago(post.created_at),
                 "image_url": post.image_url,
                 "text": post.text,
                 "task_id": post.task_id,
+                "task_title": task_i.title,
                 "author_username": author.username,
                 "author_avatar": author.avatar_url,
                 "likes_count": 0,
@@ -135,20 +138,24 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
                 Posts,
                 func.coalesce(likes_subq.c.likes_count, 0).label("likes_count"),
                 func.coalesce(comments_subq.c.comments_count, 0).label("comments_count"),
+                Tasks
             )
             .outerjoin(likes_subq, likes_subq.c.post_id == Posts.id)
             .outerjoin(comments_subq, comments_subq.c.post_id == Posts.id)
+            .join(Tasks, Posts.task_id == Tasks.id)
             .where(Posts.user_id == profile_user.id)
             .order_by(Posts.created_at.desc())
         )
+
 
         rows = session.execute(posts_query).all()
 
         posts_data = []
 
-        for post, likes_count, comments_count in rows:
+        for post, likes_count, comments_count, task_i in rows:
             posts_data.append({
                 "task_id": post.task_id,
+                "task_title": task_i.title,
                 "image_url": post.image_url,
                 "post_text": post.text,
                 "likes_count": cut_numbers(likes_count),

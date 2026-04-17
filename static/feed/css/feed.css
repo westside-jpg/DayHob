@@ -53,6 +53,10 @@ body {
     color: white;
 }
 
+.post-info-btn:active {
+    transform: scale(1.20);
+}
+
 .logo:active {
     transform: scale(1.10);
     transition: 0.1s ease;
@@ -124,6 +128,7 @@ body {
 .post-image {
     width: 100%;
     border-radius: 10px;
+    margin-bottom: 20px;
 }
 
 .post-avatar {
@@ -161,10 +166,48 @@ body {
     font-size: 24px;
     font-family: 'Montserrat', sans-serif;
     cursor: pointer;
-    margin-left: auto;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.post-info {
+    position: relative;
+    margin-left: auto;
+}
+
+.post-tooltip {
+    position: absolute;
+    top: 50%;
+    right: 50px;
+    transform: translateY(-50%) translateX(10px) scale(0.95);
+    border: 2px solid black;
+    border-radius: 20px;
+    padding: 12px 18px;
+    font-size: 15px;
+    font-weight: 500;
+    min-width: 200px;
+    max-width: 250px;
+    width: max-content;
+    white-space: normal;
+    word-break: break-word;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    z-index: 100;
+}
+
+.post-tooltip.active {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0) scale(1);
+}
+
+.post-tooltip {
+    transform: translateY(-50%) translateX(10px) scale(0.95);
+}
+
+.post-tooltip.active {
+    transform: translateY(-50%) translateX(0) scale(1);
 }
 
 .comment img {
@@ -196,6 +239,14 @@ body {
 .like-icon:active {
     transform: scale(1.10);
     transition: 0.1s ease;
+}
+
+.post-text {
+    margin-bottom: 10px;
+    margin-top: 0;
+    font-weight: 500;
+    font-size: 18px;
+    text-align: left;
 }
 
 .post-footer {
