@@ -113,8 +113,8 @@
                     {% endif %}
                 </div>
                 <div class="post-footer">
-                    <div class="like">
-                        <img src="/static/feed/images/like.svg" alt="" class="like-icon">
+                    <div class="like {% if post.is_liked %} liked {% endif %}" data-post-id="{{ post.id }}">
+                        <img src="{% if post.is_liked %} /static/feed/images/like-filled.svg {% else %} /static/feed/images/like.svg {% endif %}" class="like-icon">
                         <p>{{ post.likes_count }}</p>
                     </div>
                     <div class="comment">

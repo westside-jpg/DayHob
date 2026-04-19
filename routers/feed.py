@@ -17,6 +17,8 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 # == GET-РУЧКИ == #
+
+# Лента
 @router.get("/feed", response_class=HTMLResponse)
 def feed_page_get(request: Request, current_user = Depends(get_current_user)):
     if not current_user:
@@ -27,14 +29,39 @@ def feed_page_get(request: Request, current_user = Depends(get_current_user)):
             select(Tasks).where(Tasks.date == date.today())
         ).scalar_one_or_none()
 
+        likes_subq = (
+            select(Likes.post_id, func.count().label("likes_count"))
+            .group_by(Likes.post_id)
+            .subquery("likes_subq")
+        )
+
+        comments_subq = (
+            select(Comments.post_id, func.count().label("comments_count"))
+            .group_by(Comments.post_id)
+            .subquery("comments_subq")
+        )
+
+        is_liked_subq = (
+            select(Likes.post_id)
+            .where(Likes.user_id == current_user.id)
+            .subquery("is_liked_subq")
+        )
+
         rows = session.execute(
-            select(Posts, Users, Tasks)
+            select(Posts, Users, Tasks,
+                   func.coalesce(likes_subq.c.likes_count, 0).label("likes_count"),
+                   func.coalesce(comments_subq.c.comments_count, 0).label("comments_count"),
+                   is_liked_subq.c.post_id.isnot(None).label("is_liked")
+                   )
             .join(Users, Posts.user_id == Users.id)
             .join(Tasks, Posts.task_id == Tasks.id)
+            .outerjoin(likes_subq, likes_subq.c.post_id == Posts.id)
+            .outerjoin(comments_subq, comments_subq.c.post_id == Posts.id)
+            .outerjoin(is_liked_subq, is_liked_subq.c.post_id == Posts.id)
         ).all()
 
         posts = []
-        for post, author, task_i in rows:
+        for post, author, task_i, likes_count, comments_count, is_liked in rows:
             posts.append({
                 "id": post.id,
                 "created_at": time_ago(post.created_at),
@@ -44,8 +71,9 @@ def feed_page_get(request: Request, current_user = Depends(get_current_user)):
                 "task_title": task_i.title,
                 "author_username": author.username,
                 "author_avatar": author.avatar_url,
-                "likes_count": 0,
-                "comments_count": 0
+                "is_liked": is_liked,
+                "likes_count": likes_count,
+                "comments_count": comments_count
             })
 
         return templates.TemplateResponse("feed/feed.html", {
@@ -56,6 +84,7 @@ def feed_page_get(request: Request, current_user = Depends(get_current_user)):
             "time_until": time_until_next_day()
         })
 
+# Поиск
 @router.get("/search", response_class=HTMLResponse)
 def search_page_get(request: Request, current_user = Depends(get_current_user)):
     if not current_user:
@@ -80,6 +109,7 @@ def search_page_get(request: Request, current_user = Depends(get_current_user)):
         "results": results
     })
 
+# Логика поиска
 @router.get("/search/users")
 def search_users(query: str, current_user=Depends(get_current_user)):
     if not current_user:
@@ -95,6 +125,7 @@ def search_users(query: str, current_user=Depends(get_current_user)):
 
         return [{"username": u.username, "avatar_url": u.avatar_url} for u in users]
 
+# Профиль
 @router.get("/profile/{username}")
 def profile_page_get(request: Request, username: str, current_user = Depends(get_current_user)):
     if not current_user:
@@ -124,13 +155,19 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
         likes_subq = (
             select(Likes.post_id, func.count().label("likes_count"))
             .group_by(Likes.post_id)
-            .subquery()
+            .subquery("likes_subq")
         )
 
         comments_subq = (
             select(Comments.post_id, func.count().label("comments_count"))
             .group_by(Comments.post_id)
-            .subquery()
+            .subquery("comments_subq")
+        )
+
+        is_liked_subq = (
+            select(Likes.post_id)
+            .where(Likes.user_id == current_user.id)
+            .subquery("is_liked_subq")
         )
 
         posts_query = (
@@ -138,11 +175,13 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
                 Posts,
                 func.coalesce(likes_subq.c.likes_count, 0).label("likes_count"),
                 func.coalesce(comments_subq.c.comments_count, 0).label("comments_count"),
-                Tasks
+                Tasks,
+                is_liked_subq.c.post_id.isnot(None).label("is_liked")
             )
             .outerjoin(likes_subq, likes_subq.c.post_id == Posts.id)
             .outerjoin(comments_subq, comments_subq.c.post_id == Posts.id)
             .join(Tasks, Posts.task_id == Tasks.id)
+            .outerjoin(is_liked_subq, is_liked_subq.c.post_id == Posts.id)
             .where(Posts.user_id == profile_user.id)
             .order_by(Posts.created_at.desc())
         )
@@ -152,12 +191,14 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
 
         posts_data = []
 
-        for post, likes_count, comments_count, task_i in rows:
+        for post, likes_count, comments_count, task_i, is_liked in rows:
             posts_data.append({
+                "id": post.id,
                 "task_id": post.task_id,
                 "task_title": task_i.title,
                 "image_url": post.image_url,
                 "post_text": post.text,
+                "is_liked": is_liked,
                 "likes_count": cut_numbers(likes_count),
                 "comments_count": cut_numbers(comments_count),
                 "created_at": time_ago(post.created_at)
@@ -207,3 +248,32 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
             "declination": declination,
             "time_until": time_until_next_day()
         })
+
+# Логика лайка
+@router.post("/post/{post_id}/like")
+def toggle_like(post_id: int, current_user=Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    with session_factory() as session:
+        existing = session.execute(
+            select(Likes).where(
+                Likes.post_id == post_id,
+                Likes.user_id == current_user.id
+            )
+        ).scalar_one_or_none()
+
+        if existing:
+            session.delete(existing)
+            session.commit()
+            liked = False
+        else:
+            session.add(Likes(post_id=post_id, user_id=current_user.id))
+            session.commit()
+            liked = True
+
+        count = session.execute(
+            select(func.count()).where(Likes.post_id == post_id)
+        ).scalar()
+
+    return {"liked": liked, "count": count}
