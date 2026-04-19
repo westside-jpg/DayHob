@@ -400,32 +400,37 @@ body {
 .comment img {
     width: 24px;
     height: 24px;
-    transition: filter 0.2s ease;
     cursor: pointer;
 }
 
 .like img {
     width: 27px;
     height: 27px;
-    transition: filter 0.2s ease;
     cursor: pointer;
 }
 
-.like:hover img {
-    filter: invert(27%) sepia(100%) saturate(700%) hue-rotate(320deg);
+.like-icon {
+    transition: 0.2s ease;
 }
 
-.comment:hover img {
-    filter: invert(27%) sepia(100%) saturate(700%) hue-rotate(200deg);
-}
-
-.like.liked img {
-    filter: invert(27%) sepia(100%) saturate(700%) hue-rotate(320deg);
+.like-icon:hover {
+    transform: scale(1.10);
 }
 
 .like-icon:active {
+    transform: scale(1.25);
+}
+
+.comment-icon {
+    transition: 0.2s ease;
+}
+
+.comment-icon:hover {
     transform: scale(1.10);
-    transition: 0.1s ease;
+}
+
+.comment-icon:active {
+    transform: scale(1.25);
 }
 
 .post-footer {
