@@ -23,16 +23,16 @@ def time_ago(dt):
         years = int(seconds // 31536000)
         return f"{years} г. назад"
 
-def time_until_next_day():
-    tz = zoneinfo.ZoneInfo("Asia/Vladivostok")
-    now = datetime.now(tz)
-    tomorrow = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
-    diff = tomorrow - now
-
-    hours = int(diff.total_seconds() // 3600)
-    minutes = int((diff.total_seconds() % 3600) // 60)
-
-    return f"{hours:02d}:{minutes:02d}"
+# def time_until_next_day():
+#     tz = zoneinfo.ZoneInfo("Asia/Vladivostok")
+#     now = datetime.now(tz)
+#     tomorrow = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+#     diff = tomorrow - now
+#
+#     hours = int(diff.total_seconds() // 3600)
+#     minutes = int((diff.total_seconds() % 3600) // 60)
+#
+#     return f"{hours:02d}:{minutes:02d}"
 
 def cut_numbers(number):
     if number >= 1_000_000:

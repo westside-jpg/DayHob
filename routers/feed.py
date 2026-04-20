@@ -9,7 +9,7 @@ from sqlalchemy.sql.functions import func
 from models import Tasks, Posts, Users, Likes, Comments, Followers
 from database import session_factory
 from services.dependencies import get_current_user
-from services.feed import time_ago, time_until_next_day, declination_friends, declination_subs, declination_posts, \
+from services.feed import time_ago, declination_friends, declination_subs, declination_posts, \
     cut_numbers
 from fastapi.responses import JSONResponse
 
@@ -81,7 +81,6 @@ def feed_page_get(request: Request, current_user = Depends(get_current_user)):
             "task": task,
             "posts": posts,
             "user": current_user,
-            "time_until": time_until_next_day()
         })
 
 # Поиск
@@ -105,7 +104,6 @@ def search_page_get(request: Request, current_user = Depends(get_current_user)):
     return templates.TemplateResponse("feed/search.html", {
         "request": request,
         "user": current_user,
-        "time_until": time_until_next_day(),
         "results": results
     })
 
@@ -235,19 +233,32 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
             "friends": declination_friends(friends_count)
         }
 
+        is_subscribed_query = session.execute(
+            select(Followers).where(
+                Followers.follower_id == current_user.id,
+                Followers.following_id == profile_user.id)
+        ).scalar_one_or_none()
+
+        if not is_subscribed_query:
+            is_subscribed = False
+        else:
+            is_subscribed = True
+
         return templates.TemplateResponse("feed/profile.html", {
             "request": request,
             "current_user": current_user,
             "profile_user": profile_user,
             "is_own_profile": is_own_profile,
-            "is_following": is_following,
+            "is_subscribed": is_subscribed,
             "posts": posts_data,
             "posts_count": cut_numbers(posts_count),
             "followers_count": cut_numbers(followers_count),
             "friends_count": cut_numbers(friends_count),
             "declination": declination,
-            "time_until": time_until_next_day()
         })
+
+
+# == POST-РУЧКИ == #
 
 # Логика лайка
 @router.post("/post/{post_id}/like")
@@ -276,4 +287,40 @@ def toggle_like(post_id: int, current_user=Depends(get_current_user)):
             select(func.count()).where(Likes.post_id == post_id)
         ).scalar()
 
-    return {"liked": liked, "count": count}
+    return {"liked": liked, "count": cut_numbers(count)}
+
+# Логика подписки
+@router.post("/profile/{username}/follow")
+def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    with session_factory() as session:
+        user = session.execute(
+            select(Users).where(Users.username == username)
+        ).scalar_one_or_none()
+
+        if not user:
+            return {"error": "not found"}
+
+        existing = session.execute(
+            select(Followers).where(
+                Followers.following_id == user.id,
+                Followers.follower_id == current_user.id
+            )
+        ).scalar_one_or_none()
+
+        if existing:
+            session.delete(existing)
+            session.commit()
+            is_subscribed = False
+        else:
+            session.add(Followers(following_id=user.id, follower_id=current_user.id))
+            session.commit()
+            is_subscribed = True
+
+        followers_count = session.execute(
+            select(func.count()).where(Followers.following_id == user.id)
+        ).scalar()
+
+        return {"is_subscribed": is_subscribed, "followers_count": cut_numbers(followers_count)}

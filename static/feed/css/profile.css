@@ -472,3 +472,8 @@ a {
     background: black;
     color: white;
 }
+
+.follow-btn.unfollow:hover {
+    background: red;
+    border-color: red;
+}
