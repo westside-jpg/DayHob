@@ -20,9 +20,11 @@ input.addEventListener('input', async () => {
     }
 
     container.innerHTML = users.map(user => `
+    <a href="/profile/${ user.username }">
         <div class="result">
             <img class="result-avatar" src="${user.avatar_url || '/static/feed/images/default_avatar.svg'}" alt="">
             <p class="result-name">${user.username}</p>
         </div>
+    </a>
     `).join('')
 })
