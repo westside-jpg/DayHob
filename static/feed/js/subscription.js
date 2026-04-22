@@ -9,5 +9,8 @@ if (followBtn) {
         followBtn.textContent = data.is_subscribed ? 'Отписаться' : 'Подписаться'
         followBtn.classList.toggle('unfollow', data.is_subscribed)
         document.querySelector('#followers-count').textContent = data.followers_count
+        document.querySelector('#subs-declination').textContent = data.declination_subs
+        document.querySelector('#friends-count').textContent = data.friends_count
+        document.querySelector('#friends-declination').textContent = data.declination_friends
     })
 }

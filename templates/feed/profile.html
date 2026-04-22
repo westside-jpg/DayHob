@@ -73,12 +73,12 @@
             {% endif %}
             <div class="stats">
                 <div class="stats-item">
-                    <p class="stats-number">{{ friends_count }}<br></p>
-                    <p class="stats-category">{{ declination.friends }}</p>
+                    <p class="stats-number" id="friends-count">{{ friends_count }}<br></p>
+                    <p class="stats-category" id="friends-declination">{{ declination.friends }}</p>
                 </div>
                 <div class="stats-item">
                     <p class="stats-number" id="followers-count">{{ followers_count }}<br></p>
-                    <p class="stats-category">{{ declination.subs }}</p>
+                    <p class="stats-category" id="subs-declination">{{ declination.subs }}</p>
                 </div>
                 <div class="stats-item">
                     <p class="stats-number">{{ posts_count }}<br></p>
@@ -115,9 +115,20 @@
                         <img src="{% if post.is_liked %} /static/feed/images/like-filled.svg {% else %} /static/feed/images/like.svg {% endif %}" class="like-icon">
                         <p>{{ post.likes_count }}</p>
                     </div>
-                    <div class="comment">
+                    <div class="comment" data-post-id="{{ post.id }}">
                         <img src="/static/feed/images/comment.svg" alt="" class="comment-icon">
                         <p>{{ post.comments_count }}</p>
+                    </div>
+                </div>
+                <div class="comments-section">
+                    <div class="comments-list">
+                    </div>
+                    <div class="comment-input-row">
+                            <img class="comment-avatar" src="{{ current_user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="">
+                            <textarea id="text" class="comment-input" placeholder="Написать комментарий..." rows="1"></textarea>
+                            <button class="comment-send-btn">
+                                <img src="/static/feed/images/send-comment.svg" alt="">
+                            </button>
                     </div>
                 </div>
             </div>
@@ -126,7 +137,9 @@
     </div>
     <script src="/static/feed/js/timer.js"></script>
     <script src="/static/feed/js/subscription.js"></script>
-    <script src="/static/feed/js/likes_and_comments.js"></script>
-    <script src="/static/feed/js/task_info.js"></script>
+    <script src="/static/feed/js/likes.js"></script>
+    <script src="/static/feed/js/task-info.js"></script>
+    <script src="/static/feed/js/comments-show.js"></script>
+    <script src="/static/feed/js/comment-send.js"></script>
 </body>
 </html>

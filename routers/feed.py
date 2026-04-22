@@ -35,10 +35,10 @@ def feed_page_get(request: Request, current_user = Depends(get_current_user)):
             .subquery("likes_subq")
         )
 
-        comments_subq = (
+        comments_count_subq = (
             select(Comments.post_id, func.count().label("comments_count"))
             .group_by(Comments.post_id)
-            .subquery("comments_subq")
+            .subquery("comments_count_subq")
         )
 
         is_liked_subq = (
@@ -50,13 +50,13 @@ def feed_page_get(request: Request, current_user = Depends(get_current_user)):
         rows = session.execute(
             select(Posts, Users, Tasks,
                    func.coalesce(likes_subq.c.likes_count, 0).label("likes_count"),
-                   func.coalesce(comments_subq.c.comments_count, 0).label("comments_count"),
-                   is_liked_subq.c.post_id.isnot(None).label("is_liked")
+                   func.coalesce(comments_count_subq.c.comments_count, 0).label("comments_count"),
+                   is_liked_subq.c.post_id.isnot(None).label("is_liked"),
                    )
             .join(Users, Posts.user_id == Users.id)
             .join(Tasks, Posts.task_id == Tasks.id)
             .outerjoin(likes_subq, likes_subq.c.post_id == Posts.id)
-            .outerjoin(comments_subq, comments_subq.c.post_id == Posts.id)
+            .outerjoin(comments_count_subq, comments_count_subq.c.post_id == Posts.id)
             .outerjoin(is_liked_subq, is_liked_subq.c.post_id == Posts.id)
         ).all()
 
@@ -156,10 +156,10 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
             .subquery("likes_subq")
         )
 
-        comments_subq = (
+        comments_count_subq = (
             select(Comments.post_id, func.count().label("comments_count"))
             .group_by(Comments.post_id)
-            .subquery("comments_subq")
+            .subquery("comments_count_subq")
         )
 
         is_liked_subq = (
@@ -172,12 +172,12 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
             select(
                 Posts,
                 func.coalesce(likes_subq.c.likes_count, 0).label("likes_count"),
-                func.coalesce(comments_subq.c.comments_count, 0).label("comments_count"),
+                func.coalesce(comments_count_subq.c.comments_count, 0).label("comments_count"),
                 Tasks,
                 is_liked_subq.c.post_id.isnot(None).label("is_liked")
             )
             .outerjoin(likes_subq, likes_subq.c.post_id == Posts.id)
-            .outerjoin(comments_subq, comments_subq.c.post_id == Posts.id)
+            .outerjoin(comments_count_subq, comments_count_subq.c.post_id == Posts.id)
             .join(Tasks, Posts.task_id == Tasks.id)
             .outerjoin(is_liked_subq, is_liked_subq.c.post_id == Posts.id)
             .where(Posts.user_id == profile_user.id)
@@ -257,6 +257,28 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
             "declination": declination,
         })
 
+@router.get("/post/{post_id}/comments")
+def get_comments(post_id: int, current_user=Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    with session_factory() as session:
+        rows = session.execute(
+            select(Comments, Users)
+            .join(Users, Comments.user_id == Users.id)
+            .where(Comments.post_id == post_id)
+            .order_by(Comments.created_at)
+        ).all()
+
+        return [
+            {
+            "comment_username": user.username,
+            "comment_avatar_url": user.avatar_url,
+            "comment_text": comment.text,
+            "comment_created_at": time_ago(comment.created_at)
+            }
+            for comment, user in rows
+        ]
 
 # == POST-РУЧКИ == #
 
@@ -323,4 +345,36 @@ def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
             select(func.count()).where(Followers.following_id == user.id)
         ).scalar()
 
-        return {"is_subscribed": is_subscribed, "followers_count": cut_numbers(followers_count)}
+        f1 = aliased(Followers)
+        f2 = aliased(Followers)
+
+        friends_count = session.execute(
+            select(func.count())
+            .select_from(f1)
+            .join(
+                f2,
+                and_(
+                    f1.following_id == f2.follower_id,
+                    f2.following_id == user.id
+                )
+            )
+            .where(f1.follower_id == user.id)
+        ).scalar()
+
+        return {"is_subscribed": is_subscribed,
+                "followers_count": cut_numbers(followers_count),
+                "declination_subs": declination_subs(followers_count),
+                "friends_count": cut_numbers(friends_count),
+                "declination_friends": declination_friends(friends_count),
+                }
+
+@router.post("/post/{post_id}/post-comment")
+def post_comment(post_id: int, text: str = Form(...), current_user=Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    with session_factory() as session:
+        session.add(Comments(post_id=post_id, user_id=current_user.id, text=text))
+        session.commit()
+
+    return {"ok": True}

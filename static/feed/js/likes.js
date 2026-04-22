@@ -19,16 +19,3 @@ document.querySelectorAll('.like').forEach(btn => {
         counter.textContent = data.count
     })
 })
-
-document.querySelectorAll('.comment').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const icon = btn.querySelector('.comment-icon')
-        if (btn.classList.contains('commented')) {
-            btn.classList.remove('commented')
-            icon.src = '/static/feed/images/comment.svg'
-        } else {
-            btn.classList.add('commented')
-            icon.src = '/static/feed/images/comment-filled.svg'
-        }
-    })
-})
