@@ -54,7 +54,7 @@
         <p class="s-title">Настройки</p>
         <div class="s-bio">
             <p>Био</p>
-            <textarea maxlength="150" placeholder="Расскажите о себе" id="bio">{{ user.bio or '' }}</textarea>
+            <textarea maxlength="150" placeholder="Расскажите о себе... (максимум 150 символов)" id="bio">{{ user.bio or '' }}</textarea>
         </div>
         <div class="s-avatar">
             <p>Аватар</p>
@@ -66,6 +66,8 @@
             <input type="file" id="avatar-input" style="display:none">
             <button onclick="document.getElementById('avatar-input').click()">Выбрать фото</button>
         </div>
+    </div>
+    <div class="s-apply-container">
         <button class="s-apply" id="apply-changes" data-username="{{ user.username }}">Применить настройки</button>
     </div>
     <script src="/static/feed/js/timer.js"></script>

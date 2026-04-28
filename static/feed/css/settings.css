@@ -184,7 +184,7 @@ a {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-bottom: 200px;
+    margin-bottom: 150px;
 }
 
 .s-avatar p {
@@ -262,4 +262,15 @@ a {
     background: black;
     color: white;
     transform: translateX(-50%) scale(1.10);
+}
+
+.s-apply-container {
+    position: fixed;
+    bottom: 0;
+    left: 350px;
+    right: 0;
+    padding: 100px 0 20px 0;
+    display: flex;
+    justify-content: center;
+    background: linear-gradient(to bottom, transparent, white 30%);
 }
