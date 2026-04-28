@@ -64,7 +64,7 @@
             <img src="{{ profile_user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="user-avatar">
             <p class="username">{{ profile_user.username }}</p>
             {% if profile_user.bio %}
-                <p class="bio">{{ profile_user.bio }}</p>
+                <p class="bio">{{ profile_user.bio | replace('\n', '<br>') | safe }}</p>
             {% endif %}
             {% if not is_own_profile %}
                 <button class="follow-btn {% if is_subscribed %}unfollow{% endif %}" data-username="{{ profile_user.username }}">

@@ -45,7 +45,7 @@
         </div>
         <a href="/profile/{{ user.username }}">
             <div class="profile">
-                <img src="{{ user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="avatar">
+                <img src="{{ user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="avatar" id="menu-profile-avatar">
                 <p class="menu-text">{{ user.username }}</p>
             </div>
         </a>
@@ -54,7 +54,7 @@
         <p class="s-title">Настройки</p>
         <div class="s-bio">
             <p>Био</p>
-            <textarea placeholder="Расскажите о себе" id="bio">{{ user.bio or '' }}</textarea>
+            <textarea maxlength="150" placeholder="Расскажите о себе" id="bio">{{ user.bio or '' }}</textarea>
         </div>
         <div class="s-avatar">
             <p>Аватар</p>

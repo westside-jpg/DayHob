@@ -40,6 +40,9 @@ document.getElementById('apply-changes').addEventListener('click', async (e) => 
     new_bio = document.getElementById('bio')
     new_bio.value = results.bio
 
+    menu_profile_pic = document.getElementById('menu-profile-avatar')
+    menu_profile_pic.src = results.avatar_url
+
     apply_btn = document.getElementById('apply-changes')
 
     apply_btn.textContent = "Изменения сохранены"

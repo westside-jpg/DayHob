@@ -407,8 +407,7 @@ def update_settings(
             select(Users).where(Users.username == current_user.username)
         ).scalar_one_or_none()
 
-        if bio is not None:
-            user.bio = bio
+        user.bio = bio
 
         if avatar and avatar.filename:
             user.avatar_url = upload_avatar(avatar.file, current_user.username)
