@@ -1,5 +1,6 @@
 from datetime import date
-from fastapi import APIRouter, Request, Form, Depends
+from urllib import request
+from fastapi import APIRouter, Request, Form, Depends, Form, UploadFile, File
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
@@ -12,6 +13,7 @@ from services.dependencies import get_current_user
 from services.feed import time_ago, declination_friends, declination_subs, declination_posts, \
     cut_numbers
 from fastapi.responses import JSONResponse
+from services.cloudinary import upload_avatar
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -280,6 +282,18 @@ def get_comments(post_id: int, current_user=Depends(get_current_user)):
             for comment, user in rows
         ]
 
+# Настройки
+@router.get("/settings")
+def get_settings(request: Request, current_user=Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    return templates.TemplateResponse("feed/settings.html", {
+        "request": request,
+        "user": current_user,
+    })
+
+
 # == POST-РУЧКИ == #
 
 # Логика лайка
@@ -378,3 +392,26 @@ def post_comment(post_id: int, text: str = Form(...), current_user=Depends(get_c
         session.commit()
 
     return {"ok": True}
+
+@router.post("/settings/apply")
+def update_settings(
+    bio: str = Form(None),
+    avatar: UploadFile = File(None),
+    current_user=Depends(get_current_user)
+):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    with session_factory() as session:
+        user = session.execute(
+            select(Users).where(Users.username == current_user.username)
+        ).scalar_one_or_none()
+
+        if bio is not None:
+            user.bio = bio
+
+        if avatar and avatar.filename:
+            user.avatar_url = upload_avatar(avatar.file, current_user.username)
+
+        session.commit()
+        return {"avatar_url": user.avatar_url, "bio": user.bio}
