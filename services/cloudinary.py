@@ -13,6 +13,10 @@ def upload_avatar(file, username: str) -> str:
         file,
         public_id=f"avatars/{username}",
         overwrite=True,
-        resource_type="image"
+        resource_type="image",
+        transformation=[
+            {"width": 300, "height": 300, "crop": "fill", "gravity": "face"},
+            {"quality": "auto", "fetch_format": "auto"}
+        ]
     )
     return result["secure_url"]

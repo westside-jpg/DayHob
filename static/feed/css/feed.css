@@ -350,10 +350,13 @@ body {
 }
 
 .comment-text p {
+    max-width: 500px;
     font-size: 14px;
     font-weight: 500;
     margin: 0;
     padding-left: 43px;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .comment-input-row {

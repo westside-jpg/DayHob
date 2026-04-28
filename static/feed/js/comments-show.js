@@ -28,7 +28,7 @@ document.querySelectorAll('.comment').forEach(btn => {
                             <p class="comment-time">${c.comment_created_at}</p>
                         </div>
                     </div>
-                    <div class="comment-text"><p>${c.comment_text}</p></div>
+                    <div class="comment-text"><p>${c.comment_text.replace(/\n/g, '<br>')}</p></div>
                 </div>
             `).join('')
 
