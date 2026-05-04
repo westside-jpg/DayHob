@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
 </head>
 <body>
     <div class="menu">
@@ -70,6 +71,13 @@
     <div class="s-apply-container">
         <button class="s-apply" id="apply-changes" data-username="{{ user.username }}">Применить настройки</button>
     </div>
+    <div id="crop-modal" style="display:none">
+        <div class="crop-wrapper">
+            <img id="crop-image">
+            <button id="crop-confirm">Обрезать</button>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <script src="/static/feed/js/timer.js"></script>
     <script src="/static/feed/js/avatar-catch.js"></script>
 </body>

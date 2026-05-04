@@ -274,3 +274,79 @@ a {
     justify-content: center;
     background: linear-gradient(to bottom, transparent, white 30%);
 }
+
+.cropper-container {
+    max-width: 100% !important;
+    max-height: 70vh !important;
+}
+
+.crop-wrapper {
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    max-width: 90vw;
+    max-height: 90vh;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#crop-image {
+    max-width: 100%;
+    max-height: 70vh;
+    display: block;
+}
+
+#crop-modal {
+    position: fixed;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+#crop-confirm {
+    margin-top: 20px;
+    padding: 15px 40px;
+    font-size: 18px;
+    font-weight: 500;
+    font-family: 'Montserrat', sans-serif;
+    border: 2px solid black;
+    border-radius: 30px;
+    cursor: pointer;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+#crop-confirm:hover {
+    background: black;
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+#crop-confirm:active {
+    color: white;
+    transform: scale(1.10);
+    background: #2b2b2b;
+}
+
+.cropper-bg {
+    background-image: none !important;
+}
+
+.cropper-drag-box {
+    background: transparent !important;
+}
+
+.cropper-modal {
+    background: transparent !important;
+}

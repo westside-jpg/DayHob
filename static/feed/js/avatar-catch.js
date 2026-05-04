@@ -1,3 +1,6 @@
+let croppedBlob = null
+let cropper = null
+
 document.getElementById('avatar-input').addEventListener('change', (e) => {
     const file = e.target.files[0]
     if (!file) return
@@ -9,49 +12,73 @@ document.getElementById('avatar-input').addEventListener('change', (e) => {
         return
     }
 
-    const url = URL.createObjectURL(file)
-    const preview = document.getElementById('preview-avatar')
-    preview.src = url
-    preview.style.display = 'block'
-    document.getElementById('arrow').style.display = 'block'
+    const reader = new FileReader()
+    reader.onload = (event) => {
+        const img = new Image()
+        img.onload = () => {
+            const image = document.getElementById('crop-image')
+            image.src = event.target.result
+            image.style.maxHeight = '55vh'
+            image.style.width = 'auto'
+
+            if (cropper) cropper.destroy()
+            cropper = new Cropper(image, {
+                aspectRatio: 1,
+                viewMode: 2,
+                background: false,
+            })
+
+            document.getElementById('crop-modal').style.display = 'flex'
+        }
+        img.src = event.target.result
+    }
+    reader.readAsDataURL(file)
 })
 
-document.getElementById('apply-changes').addEventListener('click', async (e) => {
+document.getElementById('crop-confirm').addEventListener('click', () => {
+    const canvas = cropper.getCroppedCanvas({
+        width: 800,
+        height: 800,
+        imageSmoothingQuality: 'high'
+    })
+
+    canvas.toBlob(blob => {
+        croppedBlob = blob
+
+        const preview = document.getElementById('preview-avatar')
+        preview.src = URL.createObjectURL(blob)
+        preview.style.display = 'block'
+        document.getElementById('arrow').style.display = 'block'
+        document.getElementById('crop-modal').style.display = 'none'
+    }, 'image/jpeg', 1.0)
+})
+
+document.getElementById('apply-changes').addEventListener('click', async () => {
     const formData = new FormData()
     formData.append('bio', document.getElementById('bio').value)
-    const fileInput = document.getElementById('avatar-input')
-    if (fileInput.files[0]) {
-        formData.append('avatar', fileInput.files[0])
+
+    if (croppedBlob) {
+        formData.append('avatar', croppedBlob, 'avatar.jpg')
     }
 
-    const response = await fetch('/settings/apply', {
-        method: 'POST',
-        body: formData
-    })
+    const response = await fetch('/settings/apply', { method: 'POST', body: formData })
     const results = await response.json()
 
-    const preview = document.getElementById('preview-avatar')
-    preview.style.display = 'none'
+    document.getElementById('preview-avatar').style.display = 'none'
     document.getElementById('arrow').style.display = 'none'
 
-    new_avatar = document.getElementById('current-avatar')
-    new_avatar.src = results.avatar_url
+    document.getElementById('current-avatar').src = results.avatar_url
+    document.getElementById('bio').value = results.bio
+    document.getElementById('menu-profile-avatar').src = results.avatar_url
 
-    new_bio = document.getElementById('bio')
-    new_bio.value = results.bio
-
-    menu_profile_pic = document.getElementById('menu-profile-avatar')
-    menu_profile_pic.src = results.avatar_url
-
-    apply_btn = document.getElementById('apply-changes')
-
-    apply_btn.textContent = "Изменения сохранены"
-    apply_btn.style.color = 'white'
-    apply_btn.style.background = 'black'
+    const btn = document.getElementById('apply-changes')
+    btn.textContent = "Изменения сохранены"
+    btn.style.color = 'white'
+    btn.style.background = 'black'
 
     await new Promise(resolve => setTimeout(resolve, 2000))
 
-    apply_btn.textContent = "Применить настройки"
-    apply_btn.style.color = 'black'
-    apply_btn.style.background = 'white'
+    btn.textContent = "Применить настройки"
+    btn.style.color = 'black'
+    btn.style.background = 'white'
 })
