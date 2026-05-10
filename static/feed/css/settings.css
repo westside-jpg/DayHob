@@ -291,6 +291,7 @@ a {
     display: flex;
     flex-direction: column;
     align-items: center;
+    border: 3px solid black;
 }
 
 #crop-image {
@@ -314,7 +315,6 @@ a {
 }
 
 #crop-confirm {
-    margin-top: 20px;
     padding: 15px 40px;
     font-size: 18px;
     font-weight: 500;

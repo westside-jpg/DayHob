@@ -293,6 +293,89 @@ def get_settings(request: Request, current_user=Depends(get_current_user)):
         "user": current_user,
     })
 
+@router.get("/friends")
+def get_friends(request: Request, current_user=Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    with session_factory() as session:
+        f1 = aliased(Followers)
+        f2 = aliased(Followers)
+
+        friends_count = session.execute(
+            select(func.count())
+            .select_from(f1)
+            .join(f2, and_(
+                f1.following_id == f2.follower_id,
+                f2.following_id == current_user.id
+            ))
+            .where(f1.follower_id == current_user.id)
+        ).scalar()
+
+        friends_ids = session.execute(
+            select(f1.following_id)
+            .join(f2, and_(
+                f1.following_id == f2.follower_id,
+                f2.following_id == current_user.id
+            ))
+            .where(f1.follower_id == current_user.id)
+        ).scalars().all()
+
+        likes_subq = (
+            select(Likes.post_id, func.count().label("likes_count"))
+            .group_by(Likes.post_id)
+            .subquery("likes_subq")
+        )
+
+        comments_count_subq = (
+            select(Comments.post_id, func.count().label("comments_count"))
+            .group_by(Comments.post_id)
+            .subquery("comments_count_subq")
+        )
+
+        is_liked_subq = (
+            select(Likes.post_id)
+            .where(Likes.user_id == current_user.id)
+            .subquery("is_liked_subq")
+        )
+
+        rows = session.execute(
+            select(Posts, Users, Tasks,
+                   func.coalesce(likes_subq.c.likes_count, 0).label("likes_count"),
+                   func.coalesce(comments_count_subq.c.comments_count, 0).label("comments_count"),
+                   is_liked_subq.c.post_id.isnot(None).label("is_liked"),
+                   )
+            .join(Users, Posts.user_id == Users.id)
+            .join(Tasks, Posts.task_id == Tasks.id)
+            .outerjoin(likes_subq, likes_subq.c.post_id == Posts.id)
+            .outerjoin(comments_count_subq, comments_count_subq.c.post_id == Posts.id)
+            .outerjoin(is_liked_subq, is_liked_subq.c.post_id == Posts.id)
+            .where(Posts.user_id.in_(friends_ids))
+            .order_by(Posts.created_at.desc())
+        ).all()
+
+        posts = []
+        for post, author, task, likes_count, comments_count, is_liked in rows:
+            posts.append({
+                "id": post.id,
+                "author_username": author.username,
+                "author_avatar": author.avatar_url,
+                "task_title": task.title,
+                "created_at": time_ago(post.created_at),
+                "image_url": post.image_url,
+                "text": post.text,
+                "likes_count": cut_numbers(likes_count),
+                "comments_count": cut_numbers(comments_count),
+                "is_liked": is_liked,
+            })
+
+        return templates.TemplateResponse("feed/friends.html", {
+            "request": request,
+            "posts": posts,
+            "current_user": current_user,
+            "friends_count": friends_count,
+            "friends_declination": declination_friends(friends_count),
+        })
 
 # == POST-РУЧКИ == #
 

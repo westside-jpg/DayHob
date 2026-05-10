@@ -33,6 +33,7 @@ document.getElementById('avatar-input').addEventListener('change', (e) => {
         img.src = event.target.result
     }
     reader.readAsDataURL(file)
+    e.target.value = ''
 })
 
 document.getElementById('crop-confirm').addEventListener('click', () => {
@@ -58,23 +59,26 @@ document.getElementById('apply-changes').addEventListener('click', async () => {
     formData.append('bio', document.getElementById('bio').value)
 
     if (croppedBlob) {
+        const localUrl = URL.createObjectURL(croppedBlob)
+        document.getElementById('current-avatar').src = localUrl
+        document.getElementById('menu-profile-avatar').src = localUrl
         formData.append('avatar', croppedBlob, 'avatar.jpg')
     }
 
-    const response = await fetch('/settings/apply', { method: 'POST', body: formData })
-    const results = await response.json()
-
     document.getElementById('preview-avatar').style.display = 'none'
     document.getElementById('arrow').style.display = 'none'
-
-    document.getElementById('current-avatar').src = results.avatar_url
-    document.getElementById('bio').value = results.bio
-    document.getElementById('menu-profile-avatar').src = results.avatar_url
 
     const btn = document.getElementById('apply-changes')
     btn.textContent = "Изменения сохранены"
     btn.style.color = 'white'
     btn.style.background = 'black'
+
+    const response = await fetch('/settings/apply', { method: 'POST', body: formData })
+    const results = await response.json()
+
+    document.getElementById('current-avatar').src = results.avatar_url
+    document.getElementById('bio').value = results.bio
+    document.getElementById('menu-profile-avatar').src = results.avatar_url
 
     await new Promise(resolve => setTimeout(resolve, 2000))
 
