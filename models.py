@@ -2,13 +2,21 @@ from datetime import datetime, date
 from sqlalchemy import String, ForeignKey, Date, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
 from typing import Annotated
-
+from enum import Enum
+from sqlalchemy import Enum as SqlEnum
 from sqlalchemy.sql.schema import UniqueConstraint
 
 created_at = Annotated[datetime, mapped_column(DateTime(timezone=True), server_default=func.now())]
 
 class Base(DeclarativeBase):
     pass
+
+class PushType(str, Enum):
+    LIKE = "like"
+    COMMENT = "comment"
+    REPLY = "reply"
+    FOLLOW = "follow"
+    SYSTEM = "system"
 
 class Users(Base):
     __tablename__ = "users"
@@ -67,3 +75,14 @@ class Followers(Base):
     followed_at: Mapped[created_at]
 
     __table_args__ = (UniqueConstraint("follower_id", "following_id"),)
+
+class Pushes(Base):
+    __tablename__ = "pushes"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    sender_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    post_id: Mapped[int | None] = mapped_column(ForeignKey("posts.id"), nullable=True)
+    text: Mapped[str] = mapped_column()
+    is_read: Mapped[bool] = mapped_column(default=False)
+    type: Mapped[PushType] = mapped_column(SqlEnum(PushType), nullable=False)
+    created_at: Mapped[created_at]

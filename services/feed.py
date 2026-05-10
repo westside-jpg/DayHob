@@ -76,3 +76,18 @@ def declination_posts(number):
         return "поста"
     else:
         return "постов"
+
+def declination_pushes(number):
+    n = abs(number)
+    if 11 <= n % 100 <= 14:
+        return "новых уведомлений"
+    last_digit = n % 10
+    if last_digit == 1:
+        return "новое уведомление"
+    elif 2 <= last_digit <= 4:
+        return "новых уведомления"
+    else:
+        return "новых уведомлений"
+
+def cut_text(text):
+    return f"{text[:70]}..."

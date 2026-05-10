@@ -5,13 +5,13 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import aliased
-from sqlalchemy.sql.expression import and_
+from sqlalchemy.sql.expression import and_, update
 from sqlalchemy.sql.functions import func
-from models import Tasks, Posts, Users, Likes, Comments, Followers
+from models import Tasks, Posts, Users, Likes, Comments, Followers, Pushes, PushType
 from database import session_factory
 from services.dependencies import get_current_user
 from services.feed import time_ago, declination_friends, declination_subs, declination_posts, \
-    cut_numbers
+    cut_numbers, declination_pushes, cut_text
 from fastapi.responses import JSONResponse
 from services.cloudinary import upload_avatar
 
@@ -293,6 +293,7 @@ def get_settings(request: Request, current_user=Depends(get_current_user)):
         "user": current_user,
     })
 
+# Друзья
 @router.get("/friends")
 def get_friends(request: Request, current_user=Depends(get_current_user)):
     if not current_user:
@@ -377,6 +378,68 @@ def get_friends(request: Request, current_user=Depends(get_current_user)):
             "friends_declination": declination_friends(friends_count),
         })
 
+# Пуши
+@router.get("/push")
+def get_push(request: Request, current_user=Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    with session_factory() as session:
+        push_count = session.execute(
+            select(func.count()).select_from(Pushes)
+            .where(Pushes.user_id == current_user.id, Pushes.is_read == False)
+        ).scalar()
+
+        unread_pushes = session.execute(
+            select(Pushes, Users)
+            .outerjoin(Users, Pushes.sender_id == Users.id)
+            .where(Pushes.user_id == current_user.id, Pushes.is_read == False)
+            .order_by(Pushes.created_at.desc())
+        ).all()
+
+        read_pushes = session.execute(
+            select(Pushes, Users)
+            .outerjoin(Users, Pushes.sender_id == Users.id)
+            .where(Pushes.user_id == current_user.id, Pushes.is_read == True)
+            .order_by(Pushes.created_at.desc())
+        ).all()
+
+        pushes_unread = []
+        pushes_read = []
+
+        for push, avatar in unread_pushes:
+            pushes_unread.append({
+                "sender_avatar_url": avatar.avatar_url,
+                "sender_username": avatar.username,
+                "created_at": time_ago(push.created_at),
+                "text": push.text
+            })
+
+        for push, avatar in read_pushes:
+            pushes_read.append({
+                "sender_avatar_url": avatar.avatar_url,
+                "sender_username": avatar.username,
+                "created_at": time_ago(push.created_at),
+                "text": push.text
+            })
+
+        session.execute(
+            update(Pushes)
+            .where(Pushes.user_id == current_user.id, Pushes.is_read == False)
+            .values(is_read=True)
+        )
+
+        session.commit()
+
+        return templates.TemplateResponse("feed/push.html", {
+            "request": request,
+            "current_user": current_user,
+            "push_count": push_count,
+            "push_declination": declination_pushes(push_count),
+            "pushes_unread": pushes_unread,
+            "pushes_read": pushes_read,
+        })
+
 # == POST-РУЧКИ == #
 
 # Логика лайка
@@ -393,12 +456,39 @@ def toggle_like(post_id: int, current_user=Depends(get_current_user)):
             )
         ).scalar_one_or_none()
 
+        post = session.execute(
+            select(Posts)
+            .where(Posts.id == post_id)
+        ).scalar_one_or_none()
+
         if existing:
             session.delete(existing)
+            push = session.execute(
+                select(Pushes)
+                .where(
+                    Pushes.post_id == post_id,
+                    Pushes.type == PushType.LIKE,
+                    Pushes.user_id == post.user_id,
+                    Pushes.sender_id == current_user.id
+                )
+            ).scalar_one_or_none()
+
+            if push:
+                session.delete(push)
+
             session.commit()
             liked = False
         else:
             session.add(Likes(post_id=post_id, user_id=current_user.id))
+            session.add(Pushes(
+                    user_id=post.user_id,
+                    sender_id=current_user.id,
+                    text=f"Лайкнул Ваш пост \"{cut_text(post.text)}\"",
+                    post_id=post_id,
+                    type=PushType.LIKE,
+                    is_read=False,
+                )
+            )
             session.commit()
             liked = True
 
