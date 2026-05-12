@@ -90,4 +90,9 @@ def declination_pushes(number):
         return "новых уведомлений"
 
 def cut_text(text):
-    return f"{text[:70]}..."
+    if not text:
+        return ""
+    if len(text) > 70:
+        return f"{text[:70]}..."
+    else:
+        return text

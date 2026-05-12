@@ -16,6 +16,7 @@ class PushType(str, Enum):
     COMMENT = "comment"
     REPLY = "reply"
     FOLLOW = "follow"
+    FRIENDS = "friends"
     SYSTEM = "system"
 
 class Users(Base):

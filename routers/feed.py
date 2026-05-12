@@ -463,32 +463,35 @@ def toggle_like(post_id: int, current_user=Depends(get_current_user)):
 
         if existing:
             session.delete(existing)
-            push = session.execute(
-                select(Pushes)
-                .where(
-                    Pushes.post_id == post_id,
-                    Pushes.type == PushType.LIKE,
-                    Pushes.user_id == post.user_id,
-                    Pushes.sender_id == current_user.id
-                )
-            ).scalar_one_or_none()
 
-            if push:
-                session.delete(push)
+            if post.user_id != current_user.id:
+                push = session.execute(
+                    select(Pushes)
+                    .where(
+                        Pushes.post_id == post_id,
+                        Pushes.type == PushType.LIKE,
+                        Pushes.user_id == post.user_id,
+                        Pushes.sender_id == current_user.id
+                    )
+                ).scalar_one_or_none()
+
+                if push:
+                    session.delete(push)
 
             session.commit()
             liked = False
         else:
             session.add(Likes(post_id=post_id, user_id=current_user.id))
-            session.add(Pushes(
-                    user_id=post.user_id,
-                    sender_id=current_user.id,
-                    text=f"Лайкнул Ваш пост \"{cut_text(post.text)}\"",
-                    post_id=post_id,
-                    type=PushType.LIKE,
-                    is_read=False,
+            if post.user_id != current_user.id:
+                session.add(Pushes(
+                        user_id=post.user_id,
+                        sender_id=current_user.id,
+                        text=f"Лайкнул Ваш пост \"{cut_text(post.text)}\"",
+                        post_id=post_id,
+                        type=PushType.LIKE,
+                        is_read=False,
+                    )
                 )
-            )
             session.commit()
             liked = True
 
@@ -519,12 +522,84 @@ def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
             )
         ).scalar_one_or_none()
 
+        # Проверяем подписан ли user на current_user
+        reverse = session.execute(
+            select(Followers).where(
+                Followers.following_id == current_user.id,
+                Followers.follower_id == user.id
+            )
+        ).scalar_one_or_none()
+
         if existing:
             session.delete(existing)
+
+            push_sub = session.execute(
+                select(Pushes)
+                .where(
+                    Pushes.user_id == user.id,
+                    Pushes.sender_id == current_user.id,
+                    Pushes.type == PushType.FOLLOW,
+                )
+            ).scalar_one_or_none()
+
+            if push_sub:
+                session.delete(push_sub)
+
+            if reverse:
+                push_fri_1 = session.execute(
+                    select(Pushes)
+                    .where(
+                        Pushes.user_id == user.id,
+                        Pushes.sender_id == current_user.id,
+                        Pushes.type == PushType.FRIENDS,
+                    )
+                ).scalar_one_or_none()
+
+                push_fri_2 = session.execute(
+                    select(Pushes)
+                    .where(
+                        Pushes.user_id == current_user.id,
+                        Pushes.sender_id == user.id,
+                        Pushes.type == PushType.FRIENDS,
+                    )
+                ).scalar_one_or_none()
+
+                if push_fri_1:
+                    session.delete(push_fri_1)
+
+                if push_fri_2:
+                    session.delete(push_fri_2)
+
             session.commit()
             is_subscribed = False
         else:
             session.add(Followers(following_id=user.id, follower_id=current_user.id))
+
+            session.add(Pushes(
+                user_id=user.id,
+                sender_id=current_user.id,
+                text=f"Подписался на Вас",
+                is_read=False,
+                type=PushType.FOLLOW,
+            ))
+
+            if reverse:
+                session.add(Pushes(
+                    user_id=user.id,
+                    sender_id=current_user.id,
+                    text=f"Теперь Ваш друг",
+                    is_read=False,
+                    type=PushType.FRIENDS,
+                ))
+
+                session.add(Pushes(
+                    user_id=current_user.id,
+                    sender_id=user.id,
+                    text=f"Теперь Ваш друг",
+                    is_read=False,
+                    type=PushType.FRIENDS,
+                ))
+
             session.commit()
             is_subscribed = True
 
@@ -561,7 +636,29 @@ def post_comment(post_id: int, text: str = Form(...), current_user=Depends(get_c
         return RedirectResponse("/login", status_code=303)
 
     with session_factory() as session:
-        session.add(Comments(post_id=post_id, user_id=current_user.id, text=text))
+        session.add(Comments(
+            post_id=post_id,
+            user_id=current_user.id,
+            text=text
+        ))
+
+        post = session.execute(
+            select(Posts)
+            .where(Posts.id == post_id)
+        ).scalar_one_or_none()
+
+        if not post:
+            return {"error": "not found"}
+
+        if post.user_id != current_user.id:
+            session.add(Pushes(
+                user_id=post.user_id,
+                sender_id=current_user.id,
+                post_id = post_id,
+                text=f"Написал комментарий к вашему посту {cut_text(post.text)}: {cut_text(text)}",
+                is_read=False,
+                type=PushType.COMMENT,
+            ))
         session.commit()
 
     return {"ok": True}
