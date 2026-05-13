@@ -18,6 +18,24 @@ inputs.forEach((input, index) => {
     })
 })
 
+inputs.forEach((input) => {
+    input.addEventListener('paste', (e) => {
+        e.preventDefault()
+
+        const pastedData = (e.clipboardData || window.clipboardData)
+            .getData('text')
+            .replace(/\D/g, '')
+            .slice(0, inputs.length)
+
+        inputs.forEach((inp, i) => {
+            inp.value = pastedData[i] || ''
+        })
+
+        const nextIndex = Math.min(pastedData.length, inputs.length - 1)
+        inputs[nextIndex].focus()
+    })
+})
+
 document.querySelector('form').addEventListener('submit', (e) => {
     const code = Array.from(inputs).map(i => i.value).join('')
 
