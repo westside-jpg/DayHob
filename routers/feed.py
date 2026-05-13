@@ -630,6 +630,7 @@ def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
                 "declination_friends": declination_friends(friends_count),
                 }
 
+# Логика публикации коммента
 @router.post("/post/{post_id}/post-comment")
 def post_comment(post_id: int, text: str = Form(...), current_user=Depends(get_current_user)):
     if not current_user:
@@ -655,7 +656,7 @@ def post_comment(post_id: int, text: str = Form(...), current_user=Depends(get_c
                 user_id=post.user_id,
                 sender_id=current_user.id,
                 post_id = post_id,
-                text=f"Написал комментарий к вашему посту {cut_text(post.text)}: {cut_text(text)}",
+                text=f"Написал комментарий к вашему посту \"{cut_text(post.text)}\": \"{cut_text(text)}\"",
                 is_read=False,
                 type=PushType.COMMENT,
             ))
