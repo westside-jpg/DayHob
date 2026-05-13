@@ -5,6 +5,7 @@ from typing import Annotated
 from enum import Enum
 from sqlalchemy import Enum as SqlEnum
 from sqlalchemy.sql.schema import UniqueConstraint
+from sqlalchemy.sql.sqltypes import Integer
 
 created_at = Annotated[datetime, mapped_column(DateTime(timezone=True), server_default=func.now())]
 
@@ -36,6 +37,7 @@ class PendingUsers(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     code: Mapped[str] = mapped_column(String(6))
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[created_at]
 
 class Tasks(Base):

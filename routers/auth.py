@@ -85,13 +85,14 @@ def email_verification_page_post(request: Request,
                                  code: str = Form(...),
                                  email: str = Form(...)):
 
-    approve, error = check_verification_email_and_register(email, code)
+    approve, error, blocked = check_verification_email_and_register(email, code)
 
     if not approve:
         return templates.TemplateResponse("auth/email_verification.html",
                                           {"request": request,
                                            "error": error,
-                                           "email": email}
+                                           "email": email,
+                                           "blocked": blocked}
                                           )
 
     return RedirectResponse(

@@ -147,8 +147,15 @@ html, body {
 }
 
 .error-item {
+    white-space: pre-line;
     color: #c00;
     font-size: clamp(14px, 3vw, 16px);
     font-weight: 500;
     line-height: 1.6;
+}
+
+input:disabled,
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }

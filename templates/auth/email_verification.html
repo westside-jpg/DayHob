@@ -26,28 +26,30 @@
             <img class="mail-icon" src="../../static/auth/images/mail.svg" alt="">
             <p class="text">Проверьте почту и введите 6-значный код ниже</p>
             <div class="code-inputs">
-                <input type="text" maxlength="1" class="code-input">
-                <input type="text" maxlength="1" class="code-input">
-                <input type="text" maxlength="1" class="code-input">
-                <input type="text" maxlength="1" class="code-input">
-                <input type="text" maxlength="1" class="code-input">
-                <input type="text" maxlength="1" class="code-input">
+                <input type="text" maxlength="1" class="code-input" {% if blocked %}disabled{% endif %}>
+                <input type="text" maxlength="1" class="code-input" {% if blocked %}disabled{% endif %}>
+                <input type="text" maxlength="1" class="code-input" {% if blocked %}disabled{% endif %}>
+                <input type="text" maxlength="1" class="code-input" {% if blocked %}disabled{% endif %}>
+                <input type="text" maxlength="1" class="code-input" {% if blocked %}disabled{% endif %}>
+                <input type="text" maxlength="1" class="code-input" {% if blocked %}disabled{% endif %}>
             </div>
             <input type="hidden" name="code" id="full-code">
             <input type="hidden" name="email" value="{{ email }}">
         </main>
         <footer class="footer">
-            <button class="btn" type="submit">Подтвердить</button>
+            <button class="btn" type="submit" {% if blocked %}disabled{% endif %}>Подтвердить</button>
         </footer>
     </form>
     <div class="resend">
         <form action="/register/resend_code" method="post">
             <p class="resend-text"></p>
             <input type="hidden" name="email" value="{{ email }}">
-            <button class="btn resend-btn" type="submit" style="display: none">Отправить еще раз</button>
+            <button class="btn resend-btn" type="submit" style="display:{% if blocked %}block{% else %}none{% endif %}">Отправить еще раз</button>
         </form>
     </div>
-    <script src="/static/auth/js/email_verification.js"></script>
-    <script src="/static/auth/js/resend_mail.js"></script>
+    {% if not blocked %}
+        <script src="/static/auth/js/email_verification.js"></script>
+        <script src="/static/auth/js/resend_mail.js"></script>
+    {% endif %}
 </body>
 </html>

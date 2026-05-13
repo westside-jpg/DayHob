@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import select
-from sqlalchemy.sql.expression import insert, delete
+from sqlalchemy.sql.expression import insert, delete, update
 
 from database import session_factory
 from models import Users, PendingUsers
@@ -161,36 +161,39 @@ def send_verification_email(email: str, code: str):
 
 def check_verification_email_and_register(email: str, input_code: str):
     with session_factory() as session:
-        query = select(
-            PendingUsers.username,
-            PendingUsers.password,
-            PendingUsers.email
-        ).where(
-            PendingUsers.email == email,
-            PendingUsers.code == input_code
+        pending = session.execute(
+            select(PendingUsers).where(PendingUsers.email == email)
+        ).scalar_one_or_none()
+
+        if not pending:
+            return False, "Пользователь не найден", False
+
+        if pending.attempts >= 5:
+            return False, "Превышено количество попыток!\nЗапросите новый код", True
+
+        if pending.code != input_code:
+            pending.attempts += 1
+            remaining = 6 - pending.attempts
+            session.commit()
+
+            return False, f"Код неверный! Осталось попыток: {remaining}", False
+
+        session.execute(
+            insert(Users).values(
+                username=pending.username,
+                password=pending.password,
+                email=pending.email
+            )
         )
-        result = session.execute(query)
 
-        row = result.first()
-
-        if not row:
-            error = "Код введен неверно"
-            return False, error
-
-        username, password, email = row
-
-        query = insert(Users).values(
-            username=username,
-            password=password,
-            email=email
+        session.execute(
+            delete(PendingUsers)
+            .where(PendingUsers.email == email)
         )
-        session.execute(query)
 
-        query = delete(PendingUsers).where(PendingUsers.email == email)
-        session.execute(query)
         session.commit()
 
-    return True, None
+        return True, None, False
 
 
 def update_pending_user_code(email: str) -> str:
@@ -203,6 +206,7 @@ def update_pending_user_code(email: str) -> str:
 
         if pending:
             pending.code = code
+            pending.attempts = 0
             pending.created_at = datetime.now()
             session.commit()
 
