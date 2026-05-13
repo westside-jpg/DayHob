@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import select
 from sqlalchemy.sql.expression import insert, delete
 
@@ -97,13 +99,30 @@ def hash_password(password: str):
 
 def register_pending_user(username: str, password: str, email: str) -> str:
     code = str(random.randint(100000, 999999))
+
     with session_factory() as session:
-        session.add(PendingUsers(
-            username=username,
-            email=email,
-            password=password,
-            code=code))
+        existing = session.execute(
+            select(PendingUsers).where(PendingUsers.email == email)
+        ).scalar_one_or_none()
+
+        if existing:
+            existing.username = username
+            existing.password = password
+            existing.code = code
+            existing.created_at = datetime.now()
+        else:
+            pending_user = PendingUsers(
+                username=username,
+                email=email,
+                password=password,
+                code=code,
+                created_at=datetime.now()
+            )
+
+            session.add(pending_user)
+
         session.commit()
+
     return code
 
 
@@ -172,6 +191,22 @@ def check_verification_email_and_register(email: str, input_code: str):
         session.commit()
 
     return True, None
+
+
+def update_pending_user_code(email: str) -> str:
+    code = str(random.randint(100000, 999999))
+
+    with session_factory() as session:
+        pending = session.execute(
+            select(PendingUsers).where(PendingUsers.email == email)
+        ).scalar_one_or_none()
+
+        if pending:
+            pending.code = code
+            pending.created_at = datetime.now()
+            session.commit()
+
+    return code
 
 # == ВХОД == #
 def verify_login(input_username: str, input_password: str):

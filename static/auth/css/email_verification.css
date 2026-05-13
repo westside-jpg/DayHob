@@ -57,6 +57,26 @@ html, body {
     align-items: center;
     justify-content: center;
     padding: 40px 20px;
+    padding-bottom: 0;
+}
+
+.resend {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.resend button {
+    padding: 12px 30px;
+    width: auto;
+    min-width: 200px;
+}
+
+.resend p {
+    color: gray;
 }
 
 .mail-icon {

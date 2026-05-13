@@ -40,6 +40,14 @@
             <button class="btn" type="submit">Подтвердить</button>
         </footer>
     </form>
-    <script src="../../static/auth/js/email_verification.js"></script>
+    <div class="resend">
+        <form action="/register/resend_code" method="post">
+            <p class="resend-text"></p>
+            <input type="hidden" name="email" value="{{ email }}">
+            <button class="btn resend-btn" type="submit" style="display: none">Отправить еще раз</button>
+        </form>
+    </div>
+    <script src="/static/auth/js/email_verification.js"></script>
+    <script src="/static/auth/js/resend-mail.js"></script>
 </body>
 </html>

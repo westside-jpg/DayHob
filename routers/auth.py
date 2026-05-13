@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Request, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
-from services.auth import check_register, hash_password, verify_login, register_pending_user, \
-    send_verification_email, check_verification_email_and_register
+from services.auth import (check_register, hash_password, verify_login,
+                           register_pending_user, send_verification_email,
+                           check_verification_email_and_register, update_pending_user_code)
 from services.auth_jwt import create_access_token
 
 router = APIRouter()
@@ -85,3 +86,12 @@ def email_verification_page_post(request: Request,
         return templates.TemplateResponse("auth/email_verification.html", {"request": request, "error": error, "email": email})
 
     return templates.TemplateResponse("auth/login.html", {"request": request})
+
+@router.post("/register/resend_code")
+def resend_verification_code(email: str = Form(...)):
+    code = update_pending_user_code(email)
+    send_verification_email(email, code)
+    return RedirectResponse(
+        f"/register/email_verification?email={email}&resent=true",
+        status_code=303
+    )
