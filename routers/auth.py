@@ -11,8 +11,13 @@ templates = Jinja2Templates(directory="templates")
 
 # == GET-РУЧКИ == #
 @router.get("/login", response_class=HTMLResponse)
-def login_page_get(request: Request):
-    return templates.TemplateResponse("auth/login.html", {"request": request})
+def login_page_get(request: Request,
+                   registered: str = None):
+    success = registered == "true"
+    return templates.TemplateResponse("auth/login.html",
+                                      {"request": request,
+                                       "success": success}
+                                      )
 
 @router.get("/register", response_class=HTMLResponse)
 def register_page_get(request: Request):
@@ -83,9 +88,16 @@ def email_verification_page_post(request: Request,
     approve, error = check_verification_email_and_register(email, code)
 
     if not approve:
-        return templates.TemplateResponse("auth/email_verification.html", {"request": request, "error": error, "email": email})
+        return templates.TemplateResponse("auth/email_verification.html",
+                                          {"request": request,
+                                           "error": error,
+                                           "email": email}
+                                          )
 
-    return templates.TemplateResponse("auth/login.html", {"request": request})
+    return RedirectResponse(
+        "/login?registered=true",
+        status_code=303
+    )
 
 @router.post("/register/resend_code")
 def resend_verification_code(email: str = Form(...)):
