@@ -11,7 +11,7 @@ from models import Tasks, Posts, Users, Likes, Comments, Followers, Pushes, Push
 from database import session_factory
 from services.dependencies import get_current_user
 from services.feed import time_ago, declination_friends, declination_subs, declination_posts, \
-    cut_numbers, declination_pushes, cut_text
+    cut_numbers, declination_pushes, cut_text, delete_old_pushes
 from fastapi.responses import JSONResponse
 from services.cloudinary import upload_avatar
 
@@ -492,6 +492,7 @@ def toggle_like(post_id: int, current_user=Depends(get_current_user)):
                         is_read=False,
                     )
                 )
+                delete_old_pushes(post.user_id)
             session.commit()
             liked = True
 
@@ -582,6 +583,7 @@ def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
                 is_read=False,
                 type=PushType.FOLLOW,
             ))
+            delete_old_pushes(user.id)
 
             if reverse:
                 session.add(Pushes(
@@ -591,6 +593,7 @@ def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
                     is_read=False,
                     type=PushType.FRIENDS,
                 ))
+                delete_old_pushes(user.id)
 
                 session.add(Pushes(
                     user_id=current_user.id,
@@ -599,6 +602,7 @@ def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
                     is_read=False,
                     type=PushType.FRIENDS,
                 ))
+                delete_old_pushes(current_user.id)
 
             session.commit()
             is_subscribed = True
@@ -660,6 +664,7 @@ def post_comment(post_id: int, text: str = Form(...), current_user=Depends(get_c
                 is_read=False,
                 type=PushType.COMMENT,
             ))
+            delete_old_pushes(post.user_id)
         session.commit()
 
     return {"ok": True}

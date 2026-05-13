@@ -1,6 +1,14 @@
 from datetime import datetime, timezone, timedelta
 import zoneinfo
 
+from sqlalchemy.orm.session import Session
+from sqlalchemy.sql.expression import select, delete
+from sqlalchemy.sql.functions import func
+
+from database import session_factory
+from models import Pushes, created_at
+
+
 def time_ago(dt):
     diff = datetime.now(timezone.utc) - dt
     seconds = diff.total_seconds()
@@ -96,3 +104,24 @@ def cut_text(text):
         return f"{text[:70]}..."
     else:
         return text
+
+
+def delete_old_pushes(user_id):
+    with session_factory() as session:
+
+        count = session.execute(
+            select(func.count()).where(Pushes.user_id == user_id)
+        ).scalar()
+
+        if count > 250:
+            old_ids = session.execute(
+                select(Pushes.id)
+                .where(Pushes.user_id == user_id)
+                .order_by(Pushes.created_at.desc())
+                .offset(250)
+            ).scalars().all()
+
+            session.execute(
+                delete(Pushes).where(Pushes.id.in_(old_ids))
+            )
+            session.commit()
