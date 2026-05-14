@@ -125,3 +125,18 @@ def delete_old_pushes(user_id):
                 delete(Pushes).where(Pushes.id.in_(old_ids))
             )
             session.commit()
+
+def cut_pushes_count(pushes_count):
+    if pushes_count > 99:
+        return "99+"
+    return str(pushes_count)
+
+def unread_pushes_count_func(current_user):
+    with session_factory() as session:
+        count = session.execute(
+            select(func.count())
+            .select_from(Pushes)
+            .where(Pushes.user_id == current_user.id, Pushes.is_read == False)
+        ).scalar_one_or_none()
+
+        return count

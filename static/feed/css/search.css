@@ -213,3 +213,38 @@ a {
     font-weight: 500;
     margin: 0;
 }
+
+.push-icon-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.push-badge {
+    position: absolute;
+
+    top: -6px;
+    right: -8px;
+
+    min-width: 18px;
+    height: 18px;
+
+    padding: 0 5px;
+
+    border-radius: 999px;
+
+    background: #ff3b30;
+    color: white;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+}
+
+.push-icon-wrapper img {
+    padding-top: 4px;
+}

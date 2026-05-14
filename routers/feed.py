@@ -11,7 +11,7 @@ from models import Tasks, Posts, Users, Likes, Comments, Followers, Pushes, Push
 from database import session_factory
 from services.dependencies import get_current_user
 from services.feed import time_ago, declination_friends, declination_subs, declination_posts, \
-    cut_numbers, declination_pushes, cut_text, delete_old_pushes
+    cut_numbers, declination_pushes, cut_text, delete_old_pushes, cut_pushes_count, unread_pushes_count_func
 from fastapi.responses import JSONResponse
 from services.cloudinary import upload_avatar
 
@@ -78,11 +78,14 @@ def feed_page_get(request: Request, current_user = Depends(get_current_user)):
                 "comments_count": comments_count
             })
 
+        unread_pushes_count = unread_pushes_count_func(current_user)
+
         return templates.TemplateResponse("feed/feed.html", {
             "request": request,
             "task": task,
             "posts": posts,
             "user": current_user,
+            "unread_pushes_count": cut_pushes_count(unread_pushes_count),
         })
 
 # Поиск
@@ -103,10 +106,13 @@ def search_page_get(request: Request, current_user = Depends(get_current_user)):
                 "username": result.username
             })
 
+    unread_pushes_count = unread_pushes_count_func(current_user)
+
     return templates.TemplateResponse("feed/search.html", {
         "request": request,
         "user": current_user,
-        "results": results
+        "results": results,
+        "unread_pushes_count": cut_pushes_count(unread_pushes_count),
     })
 
 # Логика поиска
@@ -246,6 +252,8 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
         else:
             is_subscribed = True
 
+        unread_pushes_count = unread_pushes_count_func(current_user)
+
         return templates.TemplateResponse("feed/profile.html", {
             "request": request,
             "current_user": current_user,
@@ -257,6 +265,7 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
             "followers_count": cut_numbers(followers_count),
             "friends_count": cut_numbers(friends_count),
             "declination": declination,
+            "unread_pushes_count": cut_pushes_count(unread_pushes_count)
         })
 
 @router.get("/post/{post_id}/comments")
@@ -288,9 +297,12 @@ def get_settings(request: Request, current_user=Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
+    unread_pushes_count = unread_pushes_count_func(current_user)
+
     return templates.TemplateResponse("feed/settings.html", {
         "request": request,
         "user": current_user,
+        "unread_pushes_count": cut_pushes_count(unread_pushes_count)
     })
 
 # Друзья
@@ -370,12 +382,15 @@ def get_friends(request: Request, current_user=Depends(get_current_user)):
                 "is_liked": is_liked,
             })
 
+        unread_pushes_count = unread_pushes_count_func(current_user)
+
         return templates.TemplateResponse("feed/friends.html", {
             "request": request,
             "posts": posts,
             "current_user": current_user,
             "friends_count": friends_count,
             "friends_declination": declination_friends(friends_count),
+            "unread_pushes_count": cut_pushes_count(unread_pushes_count)
         })
 
 # Пуши

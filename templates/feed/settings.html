@@ -24,7 +24,14 @@
         </a>
         <a href="/push">
             <div class="push">
-                <img src="/static/feed/images/push.svg" alt="">
+                <div class="push-icon-wrapper">
+                    <img src="../../static/feed/images/push.svg" alt="">
+                    {% if unread_pushes_count != "0" %}
+                    <div class="push-badge">
+                        {{ unread_pushes_count }}
+                    </div>
+                    {% endif %}
+                </div>
                 <p class="menu-text">Пуши</p>
             </div>
         </a>
