@@ -693,6 +693,9 @@ def update_settings(
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
+    if bio is not None and len(bio) > 150:
+        return {"error": "Максимальная длина описания профиля — 150 символов"}
+
     with session_factory() as session:
         user = session.execute(
             select(Users).where(Users.username == current_user.username)

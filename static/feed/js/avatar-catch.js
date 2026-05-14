@@ -55,34 +55,78 @@ document.getElementById('crop-confirm').addEventListener('click', () => {
 })
 
 document.getElementById('apply-changes').addEventListener('click', async () => {
+    const bio = document.getElementById('bio').value
+    const errorBlock = document.querySelector('.error')
+    const btn = document.getElementById('apply-changes')
+
+    if (bio.length > 150) {
+        errorBlock.textContent = 'Максимальная длина описания профиля — 150 символов'
+        errorBlock.style.display = 'block'
+
+        btn.textContent = "Ошибка"
+        btn.style.color = 'white'
+        btn.style.background = 'red'
+        btn.style.borderColor = 'red'
+        btn.disabled = true
+        btn.style.cursor = 'not-allowed'
+
+        await new Promise(resolve => setTimeout(resolve, 2000))
+
+        btn.textContent = "Применить настройки"
+        btn.style.color = 'black'
+        btn.style.background = 'white'
+        btn.style.borderColor = 'black'
+        btn.disabled = false
+        btn.style.cursor = 'pointer'
+
+        return
+    }
+
+    btn.textContent = "Подождите, изменения применяются..."
+    btn.style.color = 'white'
+    btn.style.background = 'gray'
+    btn.style.borderColor = 'gray'
+    btn.disabled = true
+    btn.style.cursor = 'not-allowed'
+
+    errorBlock.style.display = 'none'
+
     const formData = new FormData()
-    formData.append('bio', document.getElementById('bio').value)
+    formData.append('bio', bio)
 
     if (croppedBlob) {
-        const localUrl = URL.createObjectURL(croppedBlob)
-        document.getElementById('current-avatar').src = localUrl
-        document.getElementById('menu-profile-avatar').src = localUrl
         formData.append('avatar', croppedBlob, 'avatar.jpg')
+    }
+
+    const response = await fetch('/settings/apply', {
+        method: 'POST',
+        body: formData
+    })
+
+    const results = await response.json()
+
+    if (results.error) {
+        errorBlock.textContent = results.error
+        errorBlock.style.display = 'block'
+        return
     }
 
     document.getElementById('preview-avatar').style.display = 'none'
     document.getElementById('arrow').style.display = 'none'
 
-    const btn = document.getElementById('apply-changes')
     btn.textContent = "Изменения сохранены"
     btn.style.color = 'white'
     btn.style.background = 'black'
+    btn.style.borderColor = 'black'
 
-    const response = await fetch('/settings/apply', { method: 'POST', body: formData })
-    const results = await response.json()
-
-    document.getElementById('current-avatar').src = results.avatar_url
-    document.getElementById('bio').value = results.bio
-    document.getElementById('menu-profile-avatar').src = results.avatar_url
+    document.getElementById('current-avatar').src = URL.createObjectURL(croppedBlob)
+    document.getElementById('menu-profile-avatar').src = URL.createObjectURL(croppedBlob)
 
     await new Promise(resolve => setTimeout(resolve, 2000))
 
     btn.textContent = "Применить настройки"
     btn.style.color = 'black'
     btn.style.background = 'white'
+    btn.disabled = false
+    btn.style.cursor = 'pointer'
 })
