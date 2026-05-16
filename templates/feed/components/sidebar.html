@@ -1,0 +1,53 @@
+<div class="menu">
+    <a href="/feed">
+        <img class="logo" src="/static/feed/images/logo.svg" alt="">
+    </a>
+    <a href="/search">
+        <div class="search">
+            <img src="/static/feed/images/search.svg" alt="">
+            <p class="menu-text">Поиск</p>
+        </div>
+    </a>
+    <a href="/push">
+        <div class="push">
+            <div class="push-icon-wrapper">
+                <img src="/static/feed/images/push.svg" alt="">
+                <div class="push-badge" id="push-badge" {% if unread_pushes_count == "0" %}style="display:none"{% endif %}>
+                    {{ unread_pushes_count }}
+                </div>
+            </div>
+            <p class="menu-text">Пуши</p>
+        </div>
+    </a>
+    <a href="/friends">
+        <div class="friends">
+            <img src="/static/feed/images/friends.svg" alt="">
+            <p class="menu-text">Друзья</p>
+        </div>
+    </a>
+    <a href="/chats">
+        <div class="chats">
+            <img src="/static/feed/images/chats.svg" alt="">
+            <p class="menu-text">Чаты</p>
+        </div>
+    </a>
+    <div class="daily">
+        <p class="daily-time"></p>
+        <p class="daily-label">ДО СЛЕДУЮЩЕГО ДЕЙЛА</p>
+    </div>
+    <div class="profile-and-settings">
+        <a href="/profile/{{ current_user.username }}">
+            <div class="profile {% if is_own_profile %}own{% endif %}">
+                <img src="{{ current_user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="avatar">
+                <p class="menu-text">{{ current_user.username }}</p>
+            </div>
+        </a>
+        {% if is_own_profile %}
+        <a href="/settings">
+            <div class="settings">
+                <img src="/static/feed/images/settings.svg" alt="">
+            </div>
+        </a>
+        {% endif %}
+    </div>
+</div>

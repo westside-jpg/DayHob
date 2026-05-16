@@ -1,99 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Пуши</title>
-    <link rel="stylesheet" href="../../static/feed/css/push.css">
-    <link rel="shortcut icon" href="../../static/feed/images/logo.svg" type="image/x-icon">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div class="menu">
-        <a href="/feed">
-            <img class="logo" src="../../static/feed/images/logo.svg" alt="">
-        </a>
-        <a href="/search">
-            <div class="search">
-                <img src="../../static/feed/images/search.svg" alt="">
-                <p class="menu-text">Поиск</p>
-            </div>
-        </a>
-        <a href="/push">
-            <div class="push">
-                <img src="../../static/feed/images/push.svg" alt="">
-                <p class="menu-text">Пуши</p>
-            </div>
-        </a>
-        <a href="/friends">
-            <div class="friends">
-                <img src="../../static/feed/images/friends.svg" alt="">
-                <p class="menu-text">Друзья</p>
-            </div>
-        </a>
-        <a href="/chats">
-            <div class="chats">
-                <img src="../../static/feed/images/chats.svg" alt="">
-                <p class="menu-text">Чаты</p>
-            </div>
-        </a>
-        <div class="daily">
-            <p class="daily-time">{{ time_until }}</p>
-            <p class="daily-label">ДО СЛЕДУЮЩЕГО ДЕЙЛА</p>
-        </div>
-        <a href="/profile/{{ current_user.username }}">
-            <div class="profile">
-                <img src="{{ current_user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="avatar">
-                <p class="menu-text">{{ current_user.username }}</p>
-            </div>
-        </a>
-    </div>
-    <div class="push-container">
-    <p class="push-title">{{ push_count }} {{ push_declination }}</p>
-        <div class="push-grid">
-            {% for push in pushes_unread %}
-            <div class="push-card">
-                <div class="user-info">
+{% extends "feed/base.html" %}
+
+{% block title %}Лента{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="/static/feed/css/push.css">
+{% endblock %}
+
+{% block content %}
+
+<div class="push-container">
+<p class="push-title">{{ push_count }} {{ push_declination }}</p>
+    <div class="push-grid">
+        {% for push in pushes_unread %}
+        <div class="push-card">
+            <div class="user-info">
+                <a href="/profile/{{ push.sender_username }}">
+                    <img src="{{ push.sender_avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="push-avatar">
+                </a>
+                <div class="name-and-time">
                     <a href="/profile/{{ push.sender_username }}">
-                        <img src="{{ push.sender_avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="push-avatar">
+                        <p class="push-username">{{ push.sender_username }}</p>
                     </a>
-                    <div class="name-and-time">
-                        <a href="/profile/{{ push.sender_username }}">
-                            <p class="push-username">{{ push.sender_username }}</p>
-                        </a>
-                        <p class="push-time">{{ push.created_at }}</p>
-                    </div>
+                    <p class="push-time">{{ push.created_at }}</p>
                 </div>
-                <p class="push-text">{{ push.text }}</p>
             </div>
-            {% endfor %}
+            <p class="push-text">{{ push.text }}</p>
         </div>
-        {% if pushes_read %}
-        <div class="push-divider">
-            <p>Прочитанные</p>
-        </div>
-        <div class="push-grid">
-            {% for push in pushes_read %}
-            <div class="push-card">
-                <div class="user-info">
-                    <a href="/profile/{{ push.sender_username }}">
-                        <img src="{{ push.sender_avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="push-avatar">
-                    </a>
-                    <div class="name-and-time">
-                        <a href="/profile/{{ push.sender_username }}">
-                            <p class="push-username">{{ push.sender_username }}</p>
-                        </a>
-                        <p class="push-time">{{ push.created_at }}</p>
-                    </div>
-                </div>
-                <p class="push-text">{{ push.text }}</p>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
+        {% endfor %}
     </div>
-    <script src="/static/feed/js/timer.js"></script>
-</body>
-</html>
+    {% if pushes_read %}
+    <div class="push-divider">
+        <p>Прочитанные</p>
+    </div>
+    <div class="push-grid">
+        {% for push in pushes_read %}
+        <div class="push-card">
+            <div class="user-info">
+                <a href="/profile/{{ push.sender_username }}">
+                    <img src="{{ push.sender_avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="push-avatar">
+                </a>
+                <div class="name-and-time">
+                    <a href="/profile/{{ push.sender_username }}">
+                        <p class="push-username">{{ push.sender_username }}</p>
+                    </a>
+                    <p class="push-time">{{ push.created_at }}</p>
+                </div>
+            </div>
+            <p class="push-text">{{ push.text }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

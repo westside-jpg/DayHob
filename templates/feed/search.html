@@ -1,84 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Поиск</title>
-    <link rel="stylesheet" href="../../static/feed/css/search.css">
-    <link rel="shortcut icon" href="../../static/feed/images/logo.svg" type="image/x-icon">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div class="menu">
-        <a href="/feed">
-            <img class="logo" src="../../static/feed/images/logo.svg" alt="">
-        </a>
-        <a href="/search">
-            <div class="search">
-                <img src="../../static/feed/images/search.svg" alt="">
-                <p class="menu-text">Поиск</p>
-            </div>
-        </a>
-        <a href="/push">
-            <div class="push">
-                <div class="push-icon-wrapper">
-                    <img src="../../static/feed/images/push.svg" alt="">
-                    {% if unread_pushes_count != "0" %}
-                    <div class="push-badge">
-                        {{ unread_pushes_count }}
-                    </div>
-                    {% endif %}
+{% extends "feed/base.html" %}
+
+{% block title %}Поиск{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="/static/feed/css/search.css">
+{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="search-input">
+        <input placeholder="Начните вводить имя..." type="text">
+    </div>
+    {% if results %}
+        <div class="search-result">
+            {% for result in results %}
+            <a href="/profile/{{ result.username }}">
+                <div class="result">
+                    <img class="result-avatar" src="{{ result.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="">
+                    <p class="result-name">{{ result.username }}</p>
                 </div>
-                <p class="menu-text">Пуши</p>
-            </div>
-        </a>
-        <a href="/friends">
-            <div class="friends">
-                <img src="../../static/feed/images/friends.svg" alt="">
-                <p class="menu-text">Друзья</p>
-            </div>
-        </a>
-        <a href="/chats">
-            <div class="chats">
-                <img src="../../static/feed/images/chats.svg" alt="">
-                <p class="menu-text">Чаты</p>
-            </div>
-        </a>
-        <div class="daily">
-            <p class="daily-time">{{ time_until }}</p>
-            <p class="daily-label">ДО СЛЕДУЮЩЕГО ДЕЙЛА</p>
+            </a>
+            {% endfor %}
         </div>
-        <a href="/profile/{{ user.username }}">
-            <div class="profile">
-                <img src="{{ user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="avatar">
-                <p class="menu-text">{{ user.username }}</p>
-            </div>
-        </a>
+    {% else %}
+    <div class="not-found">
+        <p>Таких пользователей не найдено</p>
     </div>
-    <div class="content">
-        <div class="search-input">
-            <input placeholder="Начните вводить имя..." type="text">
-        </div>
-        {% if results %}
-            <div class="search-result">
-                {% for result in results %}
-                <a href="/profile/{{ result.username }}">
-                    <div class="result">
-                        <img class="result-avatar" src="{{ result.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="">
-                        <p class="result-name">{{ result.username }}</p>
-                    </div>
-                </a>
-                {% endfor %}
-            </div>
-        {% else %}
-        <div class="not-found">
-            <p>Таких пользователей не найдено</p>
-        </div>
-        {% endif %}
-    </div>
-    <script src="/static/feed/js/timer.js"></script>
-    <script src="/static/feed/js/search.js"></script>
-</body>
-</html>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/feed/js/search.js"></script>
+{% endblock %}

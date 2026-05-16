@@ -1,152 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ profile_user.username }}</title>
-    <link rel="stylesheet" href="../../static/feed/css/profile.css">
-    <link rel="shortcut icon" href="../../static/feed/images/logo.svg" type="image/x-icon">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div class="menu">
-        <a href="/feed">
-            <img class="logo" src="../../static/feed/images/logo.svg" alt="">
-        </a>
-        <a href="/search">
-            <div class="search">
-                <img src="../../static/feed/images/search.svg" alt="">
-                <p class="menu-text">Поиск</p>
+{% extends "feed/base.html" %}
+
+{% block title %}{{ profile_user.username }}{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="/static/feed/css/profile.css">
+<link rel="stylesheet" href="/static/feed/css/components/posts.css">
+{% endblock %}
+
+{% block content %}
+
+<div class="user-profile">
+    <div class="head">
+        <img src="{{ profile_user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="user-avatar">
+        <p class="username">{{ profile_user.username }}</p>
+        {% if profile_user.bio %}
+            <p class="bio">{{ profile_user.bio | replace('\n', '<br>') | safe }}</p>
+        {% endif %}
+        {% if not is_own_profile %}
+            <button class="follow-btn {% if is_subscribed %}unfollow{% endif %}" data-username="{{ profile_user.username }}">
+                {% if is_subscribed %}Отписаться{% else %}Подписаться{% endif %}
+            </button>
+        {% endif %}
+        <div class="stats">
+            <div class="stats-item">
+                <p class="stats-number" id="friends-count">{{ friends_count }}<br></p>
+                <p class="stats-category" id="friends-declination">{{ declination.friends }}</p>
             </div>
-        </a>
-        <a href="/push">
-            <div class="push">
-                <div class="push-icon-wrapper">
-                    <img src="../../static/feed/images/push.svg" alt="">
-                    <div class="push-badge" id="push-badge" {% if unread_pushes_count == "0" %}style="display:none"{% endif %}>
-                        {{ unread_pushes_count }}
-                    </div>
-                </div>
-                <p class="menu-text">Пуши</p>
+            <div class="stats-item">
+                <p class="stats-number" id="followers-count">{{ followers_count }}<br></p>
+                <p class="stats-category" id="subs-declination">{{ declination.subs }}</p>
             </div>
-        </a>
-        <a href="/friends">
-            <div class="friends">
-                <img src="../../static/feed/images/friends.svg" alt="">
-                <p class="menu-text">Друзья</p>
+            <div class="stats-item">
+                <p class="stats-number">{{ posts_count }}<br></p>
+                <p class="stats-category">{{ declination.posts }}</p>
             </div>
-        </a>
-        <a href="/chats">
-            <div class="chats">
-                <img src="../../static/feed/images/chats.svg" alt="">
-                <p class="menu-text">Чаты</p>
-            </div>
-        </a>
-        <div class="daily">
-            <p class="daily-time">{{ time_until }}</p>
-            <p class="daily-label">ДО СЛЕДУЮЩЕГО ДЕЙЛА</p>
-        </div>
-        <div class="profile-and-settings">
-            <a href="/profile/{{ current_user.username }}">
-                <div class="profile {% if is_own_profile %}own{% endif %}">
-                    <img src="{{ current_user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="avatar">
-                    <p class="menu-text">{{ current_user.username }}</p>
-                </div>
-            </a>
-            {% if is_own_profile %}
-            <a href="/settings">
-                <div class="settings">
-                    <img src="../../static/feed/images/settings.svg" alt="">
-                </div>
-            </a>
-            {% endif %}
         </div>
     </div>
-    <div class="user-profile">
-        <div class="head">
-            <img src="{{ profile_user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="user-avatar">
-            <p class="username">{{ profile_user.username }}</p>
-            {% if profile_user.bio %}
-                <p class="bio">{{ profile_user.bio | replace('\n', '<br>') | safe }}</p>
-            {% endif %}
-            {% if not is_own_profile %}
-                <button class="follow-btn {% if is_subscribed %}unfollow{% endif %}" data-username="{{ profile_user.username }}">
-                    {% if is_subscribed %}Отписаться{% else %}Подписаться{% endif %}
-                </button>
-            {% endif %}
-            <div class="stats">
-                <div class="stats-item">
-                    <p class="stats-number" id="friends-count">{{ friends_count }}<br></p>
-                    <p class="stats-category" id="friends-declination">{{ declination.friends }}</p>
-                </div>
-                <div class="stats-item">
-                    <p class="stats-number" id="followers-count">{{ followers_count }}<br></p>
-                    <p class="stats-category" id="subs-declination">{{ declination.subs }}</p>
-                </div>
-                <div class="stats-item">
-                    <p class="stats-number">{{ posts_count }}<br></p>
-                    <p class="stats-category">{{ declination.posts }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="posts">
-            {% for post in posts %}
-            <div class="post-wrapper">
-                <div class="post">
-                    <div class="post-header">
-                        <img class="post-avatar" src="{{ profile_user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="">
-                        <div class="post-user-info">
-                            <p class="post-username">{{ profile_user.username }}</p>
-                            <p class="post-time">{{ post.created_at }}</p>
-                        </div>
-                        <div class="post-info">
-                            <p class="post-info-btn">i</p>
-                            <div class="post-tooltip">
-                                {{ post.task_title }}
-                            </div>
-                        </div>
-                    </div>
-                    {% if post.image_url %}
-                        <img class="post-image" src="{{ post.image_url }}" alt="">
-                    {% endif %}
-                    {% if post.post_text %}
-                        <p class="post-text">{{ post.post_text }}</p>
-                    {% endif %}
-                </div>
-                <div class="post-footer">
-                    <div class="like {% if post.is_liked %} liked {% endif %}" data-post-id="{{ post.id }}">
-                        <img src="{% if post.is_liked %} /static/feed/images/like-filled.svg {% else %} /static/feed/images/like.svg {% endif %}" class="like-icon">
-                        <p>{{ post.likes_count }}</p>
-                    </div>
-                    <div class="comment" data-post-id="{{ post.id }}">
-                        <img src="/static/feed/images/comment.svg" alt="" class="comment-icon">
-                        <p>{{ post.comments_count }}</p>
-                    </div>
-                </div>
-                <div class="comments-section">
-                    <div class="comments-list">
-                    </div>
-                    <div class="comment-input-row">
-                            <img class="comment-avatar" src="{{ current_user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="">
-                            <textarea id="text" maxlength="500" class="comment-input" placeholder="Написать комментарий..." rows="1"></textarea>
-                            <button class="comment-send-btn">
-                                <img src="/static/feed/images/send-comment.svg" alt="">
-                            </button>
-                    </div>
-                    <p class="error" style="display:none"></p>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    <script src="/static/feed/js/timer.js"></script>
-    <script src="/static/feed/js/subscription.js"></script>
-    <script src="/static/feed/js/likes.js"></script>
-    <script src="/static/feed/js/task-info.js"></script>
-    <script src="/static/feed/js/comments-show.js"></script>
-    <script src="/static/feed/js/comment-send.js"></script>
-    <script src="/static/feed/js/comment-textarea-extension.js"></script>
-</body>
-</html>
+    {% include "feed/components/posts.html" %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="/static/feed/js/subscription.js"></script>
+<script src="/static/feed/js/likes.js"></script>
+<script src="/static/feed/js/task-info.js"></script>
+<script src="/static/feed/js/comments-show.js"></script>
+<script src="/static/feed/js/comment-send.js"></script>
+<script src="/static/feed/js/comment-textarea-extension.js"></script>
+
+{% endblock %}

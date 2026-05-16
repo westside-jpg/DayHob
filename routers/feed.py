@@ -84,7 +84,7 @@ def feed_page_get(request: Request, current_user = Depends(get_current_user)):
             "request": request,
             "task": task,
             "posts": posts,
-            "user": current_user,
+            "current_user": current_user,
             "unread_pushes_count": cut_pushes_count(unread_pushes_count),
         })
 
@@ -110,7 +110,7 @@ def search_page_get(request: Request, current_user = Depends(get_current_user)):
 
     return templates.TemplateResponse("feed/search.html", {
         "request": request,
-        "user": current_user,
+        "current_user": current_user,
         "results": results,
         "unread_pushes_count": cut_pushes_count(unread_pushes_count),
     })
@@ -200,11 +200,14 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
         for post, likes_count, comments_count, task_i, is_liked in rows:
             posts_data.append({
                 "id": post.id,
+                "author_username": profile_user.username,
+                "author_avatar": profile_user.avatar_url,
                 "task_id": post.task_id,
                 "task_title": task_i.title,
                 "image_url": post.image_url,
                 "post_text": post.text,
                 "is_liked": is_liked,
+                "text": post.text,
                 "likes_count": cut_numbers(likes_count),
                 "comments_count": cut_numbers(comments_count),
                 "created_at": time_ago(post.created_at)
@@ -301,7 +304,7 @@ def get_settings(request: Request, current_user=Depends(get_current_user)):
 
     return templates.TemplateResponse("feed/settings.html", {
         "request": request,
-        "user": current_user,
+        "current_user": current_user,
         "unread_pushes_count": cut_pushes_count(unread_pushes_count)
     })
 
