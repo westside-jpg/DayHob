@@ -642,11 +642,14 @@ def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
             .where(f1.follower_id == user.id)
         ).scalar()
 
+        unread_pushes_count = unread_pushes_count_func(current_user)
+
         return {"is_subscribed": is_subscribed,
                 "followers_count": cut_numbers(followers_count),
                 "declination_subs": declination_subs(followers_count),
                 "friends_count": cut_numbers(friends_count),
                 "declination_friends": declination_friends(friends_count),
+                "unread_pushes_count": cut_pushes_count(unread_pushes_count)
                 }
 
 # Логика публикации коммента
@@ -654,6 +657,9 @@ def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
 def post_comment(post_id: int, text: str = Form(...), current_user=Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
+
+    if len(text) > 500:
+        return {"error": "Длина комментария больше 500 символов"}
 
     with session_factory() as session:
         session.add(Comments(

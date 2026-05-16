@@ -56,9 +56,13 @@
             {% for push in pushes_unread %}
             <div class="push-card">
                 <div class="user-info">
-                    <img src="{{ push.sender_avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="push-avatar">
+                    <a href="/profile/{{ push.sender_username }}">
+                        <img src="{{ push.sender_avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="" class="push-avatar">
+                    </a>
                     <div class="name-and-time">
-                        <p class="push-username">{{ push.sender_username }}</p>
+                        <a href="/profile/{{ push.sender_username }}">
+                            <p class="push-username">{{ push.sender_username }}</p>
+                        </a>
                         <p class="push-time">{{ push.created_at }}</p>
                     </div>
                 </div>

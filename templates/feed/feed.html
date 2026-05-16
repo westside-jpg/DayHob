@@ -104,11 +104,12 @@
                     </div>
                     <div class="comment-input-row">
                             <img class="comment-avatar" src="{{ user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="">
-                            <textarea id="text" class="comment-input" placeholder="Написать комментарий..." rows="1"></textarea>
+                            <textarea id="text" maxlength="500" class="comment-input" placeholder="Написать комментарий..." rows="1"></textarea>
                             <button class="comment-send-btn">
                                 <img src="/static/feed/images/send-comment.svg" alt="">
                             </button>
                     </div>
+                    <p class="error" style="display:none"></p>
                 </div>
             </div>
             {% endfor %}

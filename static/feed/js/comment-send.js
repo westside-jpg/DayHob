@@ -4,8 +4,34 @@ document.querySelectorAll('.comment-send-btn').forEach(btn => {
         const postId = wrapper.querySelector('.comment').dataset.postId
         const input = wrapper.querySelector('.comment-input')
         const text = input.value.trim()
+        const error = wrapper.querySelector('.error')  // ← только для этого поста
+        const send_button = btn
 
         if (!text) return
+
+        if (text.length > 500) {
+            const icon = send_button.querySelector('img')
+
+            error.textContent = 'Длина комментария больше 500 символов'
+            error.style.display = 'block'
+            send_button.style.background = 'red'
+            send_button.style.borderColor = 'red'
+            icon.style.filter = 'invert(1) brightness(2)'
+            send_button.disabled = true
+            send_button.style.cursor = 'not-allowed'
+
+            await new Promise(resolve => setTimeout(resolve, 2000))
+
+            send_button.style.background = ''
+            send_button.style.borderColor = 'black'
+            icon.style.filter = ''
+            send_button.disabled = false
+            send_button.style.cursor = 'pointer'
+
+            return
+        }
+
+        error.style.display = 'none'
 
         const formData = new FormData()
         formData.append('text', text)
@@ -16,6 +42,7 @@ document.querySelectorAll('.comment-send-btn').forEach(btn => {
         })
 
         input.value = ''
+        input.style.height = 'auto'
 
         const response = await fetch(`/post/${postId}/comments`)
         const comments = await response.json()

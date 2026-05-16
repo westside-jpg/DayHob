@@ -12,5 +12,12 @@ if (followBtn) {
         document.querySelector('#subs-declination').textContent = data.declination_subs
         document.querySelector('#friends-count').textContent = data.friends_count
         document.querySelector('#friends-declination').textContent = data.declination_friends
+        const badge = document.getElementById('push-badge')
+        if (data.unread_pushes_count === '0') {
+            badge.style.display = 'none'
+        } else {
+            badge.style.display = 'flex'
+            badge.textContent = data.unread_pushes_count
+        }
     })
 }

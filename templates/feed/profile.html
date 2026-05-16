@@ -25,11 +25,9 @@
             <div class="push">
                 <div class="push-icon-wrapper">
                     <img src="../../static/feed/images/push.svg" alt="">
-                    {% if unread_pushes_count != "0" %}
-                    <div class="push-badge">
+                    <div class="push-badge" id="push-badge" {% if unread_pushes_count == "0" %}style="display:none"{% endif %}>
                         {{ unread_pushes_count }}
                     </div>
-                    {% endif %}
                 </div>
                 <p class="menu-text">Пуши</p>
             </div>
@@ -132,11 +130,12 @@
                     </div>
                     <div class="comment-input-row">
                             <img class="comment-avatar" src="{{ current_user.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="">
-                            <textarea id="text" class="comment-input" placeholder="Написать комментарий..." rows="1"></textarea>
+                            <textarea id="text" maxlength="500" class="comment-input" placeholder="Написать комментарий..." rows="1"></textarea>
                             <button class="comment-send-btn">
                                 <img src="/static/feed/images/send-comment.svg" alt="">
                             </button>
                     </div>
+                    <p class="error" style="display:none"></p>
                 </div>
             </div>
             {% endfor %}
@@ -148,5 +147,6 @@
     <script src="/static/feed/js/task-info.js"></script>
     <script src="/static/feed/js/comments-show.js"></script>
     <script src="/static/feed/js/comment-send.js"></script>
+    <script src="/static/feed/js/comment-textarea-extension.js"></script>
 </body>
 </html>

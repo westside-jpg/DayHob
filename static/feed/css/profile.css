@@ -651,3 +651,9 @@ a {
 .push-icon-wrapper img {
     padding-top: 4px;
 }
+
+.error {
+    color: red;
+    font-size: 15px;
+    font-weight: 400;
+}

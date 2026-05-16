@@ -67,7 +67,7 @@ class Comments(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     post_id: Mapped[int] = mapped_column(ForeignKey("posts.id"), nullable=False)
-    text: Mapped[str] = mapped_column(String(1024))
+    text: Mapped[str] = mapped_column(String(500))
     created_at: Mapped[created_at]
 
 class Followers(Base):

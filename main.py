@@ -6,6 +6,8 @@ from database import sync_engine
 from models import Base
 from routers.auth import router as auth_router
 from routers.feed import router as feed_router
+from rich.logging import RichHandler
+import logging
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -15,6 +17,12 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Base.metadata.drop_all(bind=sync_engine)
 Base.metadata.create_all(bind=sync_engine)
+
+logging.basicConfig(
+    level="INFO",
+    format="%(message)s",
+    handlers=[RichHandler(rich_tracebacks=True)]
+)
 
 @app.exception_handler(404)
 def not_found_handler(request: Request, exc):
@@ -32,4 +40,4 @@ def home(request: Request):
     )
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", reload=True)
+    uvicorn.run("main:app", reload=True, use_colors=True)
