@@ -458,6 +458,111 @@ def get_push(request: Request, current_user=Depends(get_current_user)):
             "pushes_read": pushes_read,
         })
 
+
+# Список друзей пользователя
+@router.get("/profile/{username}/friends_list")
+def get_friends_list(request: Request, username: str, current_user=Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    with session_factory() as session:
+        user = session.execute(
+            select(Users).where(Users.username == username)
+        ).scalar_one_or_none()
+
+        f1 = aliased(Followers)
+        f2 = aliased(Followers)
+
+        friends_count = session.execute(
+            select(func.count())
+            .select_from(f1)
+            .join(f2, and_(
+                f1.following_id == f2.follower_id,
+                f2.following_id == current_user.id
+            ))
+            .where(f1.follower_id == current_user.id)
+        ).scalar()
+
+        friends_ids = session.execute(
+            select(f1.following_id)
+            .join(f2, and_(
+                f1.following_id == f2.follower_id,
+                f2.following_id == user.id
+            ))
+            .where(f1.follower_id == user.id)
+        ).scalars().all()
+
+        rows = session.execute(
+            select(Users)
+            .where(Users.id.in_(friends_ids))
+        ).scalars().all()
+
+        results = []
+
+        for result in rows:
+            results.append({
+                "username": result.username,
+                "avatar_url": result.avatar_url,
+            })
+
+        unread_pushes_count = unread_pushes_count_func(current_user)
+
+        return templates.TemplateResponse("feed/subs_and_friends_list.html", {
+            "request": request,
+            "current_user": current_user,
+            "count": friends_count,
+            "declination": declination_friends(friends_count),
+            "results": results,
+            "unread_pushes_count": cut_pushes_count(unread_pushes_count)
+        })
+
+
+# Список подписчиков пользователя
+@router.get("/profile/{username}/subs_list")
+def get_subs_list(request: Request, username: str, current_user=Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    with session_factory() as session:
+        user = session.execute(
+            select(Users).where(Users.username == username)
+        ).scalar_one_or_none()
+
+        subs_count = session.execute(
+            select(func.count())
+            .select_from(Followers)
+            .where(Followers.following_id == user.id)
+        ).scalar()
+
+        subs_ids = session.execute(
+            select(Followers.follower_id)
+            .where(Followers.following_id == user.id)
+        ).scalars().all()
+
+        rows = session.execute(
+            select(Users)
+            .where(Users.id.in_(subs_ids))
+        ).scalars().all()
+
+        results = []
+
+        for result in rows:
+            results.append({
+                "username": result.username,
+                "avatar_url": result.avatar_url,
+            })
+
+        unread_pushes_count = unread_pushes_count_func(current_user)
+
+        return templates.TemplateResponse("feed/subs_and_friends_list.html", {
+            "request": request,
+            "current_user": current_user,
+            "count": subs_count,
+            "declination": declination_subs(subs_count),
+            "results": results,
+            "unread_pushes_count": cut_pushes_count(unread_pushes_count)
+        })
+
 # == POST-РУЧКИ == #
 
 # Логика лайка

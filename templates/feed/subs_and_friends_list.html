@@ -1,0 +1,23 @@
+{% extends "feed/base.html" %}
+
+{% block title %}Список пользователей{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="/static/feed/css/subs_and_friends_list.css">
+{% endblock %}
+
+{% block content %}
+<div class="content">
+    <p class="count">{{ count }} {{ declination }}</p>
+    <div class="search-result">
+        {% for result in results %}
+        <a href="/profile/{{ result.username }}">
+            <div class="result">
+                <img class="result-avatar" src="{{ result.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="">
+                <p class="result-name">{{ result.username }}</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

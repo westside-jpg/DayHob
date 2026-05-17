@@ -22,14 +22,18 @@
             </button>
         {% endif %}
         <div class="stats">
-            <div class="stats-item">
-                <p class="stats-number" id="friends-count">{{ friends_count }}<br></p>
-                <p class="stats-category" id="friends-declination">{{ declination.friends }}</p>
-            </div>
-            <div class="stats-item">
-                <p class="stats-number" id="followers-count">{{ followers_count }}<br></p>
-                <p class="stats-category" id="subs-declination">{{ declination.subs }}</p>
-            </div>
+            <a href="/profile/{{ profile_user.username }}/friends_list">
+                <div class="stats-item">
+                    <p class="stats-number" id="friends-count">{{ friends_count }}<br></p>
+                    <p class="stats-category" id="friends-declination">{{ declination.friends }}</p>
+                </div>
+            </a>
+            <a href="/profile/{{ profile_user.username }}/subs_list">
+                <div class="stats-item">
+                    <p class="stats-number" id="followers-count">{{ followers_count }}<br></p>
+                    <p class="stats-category" id="subs-declination">{{ declination.subs }}</p>
+                </div>
+            </a>
             <div class="stats-item">
                 <p class="stats-number">{{ posts_count }}<br></p>
                 <p class="stats-category">{{ declination.posts }}</p>
