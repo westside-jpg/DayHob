@@ -26,6 +26,17 @@
                 <p class="post-text">{{ post.text }}</p>
             {% endif %}
         </div>
+        {% if is_own_profile %}
+        <div class="post-tools">
+            <p>...</p>
+            <div class="tools-container">
+                <div class="tools-element danger">
+                    <img src="/static/feed/images/trash.svg">
+                    <button class="tool-btn danger">Удалить пост</button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
         <div class="post-footer">
             <div class="like {% if post.is_liked %} liked {% endif %}" data-post-id="{{ post.id }}">
                 <img src="{% if post.is_liked %} /static/feed/images/like-filled.svg {% else %} /static/feed/images/like.svg {% endif %}" class="like-icon">
