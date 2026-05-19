@@ -25,3 +25,23 @@ document.addEventListener('click', () => {
         c.classList.remove('open')
     })
 })
+
+document.querySelectorAll('.tool-btn.danger').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+        e.stopPropagation()
+        const wrapper = btn.closest('.post-wrapper')
+        const postId = wrapper.dataset.postId
+
+        const response = await fetch(`/post/${postId}/delete`, { method: 'POST' })
+        const data = await response.json()
+
+        if (data.ok) {
+            showToast(data.message, "success")
+            wrapper.remove()
+            document.querySelector('#posts-count').textContent = data.count
+            document.querySelector('#posts-declination').textContent = data.declination
+        } else {
+            showToast(data.error, "error")
+        }
+    })
+})

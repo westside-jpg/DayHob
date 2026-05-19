@@ -59,14 +59,14 @@ class Likes(Base):
     __tablename__ = "likes"
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    post_id: Mapped[int] = mapped_column(ForeignKey("posts.id"), nullable=False)
+    post_id: Mapped[int] = mapped_column(ForeignKey("posts.id", ondelete="CASCADE"), nullable=False)
     liked_at: Mapped[created_at]
 
 class Comments(Base):
     __tablename__ = "comments"
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    post_id: Mapped[int] = mapped_column(ForeignKey("posts.id"), nullable=False)
+    post_id: Mapped[int] = mapped_column(ForeignKey("posts.id", ondelete="CASCADE"), nullable=False)
     text: Mapped[str] = mapped_column(String(500))
     created_at: Mapped[created_at]
 
@@ -84,7 +84,7 @@ class Pushes(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     sender_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
-    post_id: Mapped[int | None] = mapped_column(ForeignKey("posts.id"), nullable=True)
+    post_id: Mapped[int | None] = mapped_column(ForeignKey("posts.id", ondelete="CASCADE"), nullable=True)
     text: Mapped[str] = mapped_column()
     is_read: Mapped[bool] = mapped_column(default=False)
     type: Mapped[PushType] = mapped_column(SqlEnum(PushType), nullable=False)

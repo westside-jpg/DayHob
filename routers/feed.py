@@ -798,6 +798,7 @@ def post_comment(post_id: int, text: str = Form(...), current_user=Depends(get_c
 
     return {"ok": True}
 
+# Ручка обновления настроек
 @router.post("/settings/apply")
 def update_settings(
     bio: str = Form(None),
@@ -822,3 +823,35 @@ def update_settings(
 
         session.commit()
         return {"avatar_url": user.avatar_url, "bio": user.bio}
+
+# Ручка удаления поста
+@router.post("/post/{post_id}/delete")
+def delete_post(post_id: int, current_user=Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    with session_factory() as session:
+        post = session.execute(
+            select(Posts)
+            .where(Posts.id == post_id)
+        ).scalar_one_or_none()
+
+        if not post:
+            return {"error": "Ошибка удаления"}
+
+        if post.user_id != current_user.id:
+            return {"error": "У Вас нет прав удалить этот пост"}
+
+        session.delete(post)
+        session.commit()
+
+        posts_count =  session.execute(
+            select(func.count()).select_from(Posts)
+            .where(Posts.user_id == current_user.id)
+        ).scalar()
+
+        return {"ok": True,
+                "message": "Ваш пост был успешно удален",
+                "count": posts_count,
+                "declination": declination_posts(posts_count)
+                }

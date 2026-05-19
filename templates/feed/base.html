@@ -7,6 +7,7 @@
     </title>
     <link rel="stylesheet" href="/static/feed/css/base.css">
     <link rel="stylesheet" href="/static/feed/css/components/sidebar.css">
+    <link rel="stylesheet" href="/static/feed/css/components/toast.css">
     <link rel="shortcut icon" href="/static/feed/images/logo.svg" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,6 +17,10 @@
 <body>
     {% include "feed/components/sidebar.html" %}
     {% block content %}{% endblock %}
+
+    <div id="toast-container"></div>
+
+    <script src="/static/feed/js/toast.js"></script>
     <script src="/static/feed/js/timer.js"></script>
     {% block scripts %}{% endblock %}
 </body>
