@@ -277,6 +277,14 @@ def get_comments(post_id: int, current_user=Depends(get_current_user)):
         return RedirectResponse("/login", status_code=303)
 
     with session_factory() as session:
+        post = session.execute(
+            select(Posts)
+            .where(Posts.id == post_id)
+        ).scalar_one_or_none()
+
+        if not post:
+            return {"error": "Пост не найден"}
+
         rows = session.execute(
             select(Comments, Users)
             .join(Users, Comments.user_id == Users.id)
@@ -572,16 +580,19 @@ def toggle_like(post_id: int, current_user=Depends(get_current_user)):
         return RedirectResponse("/login", status_code=303)
 
     with session_factory() as session:
+        post = session.execute(
+            select(Posts)
+            .where(Posts.id == post_id)
+        ).scalar_one_or_none()
+
+        if not post:
+            return {"ok": False, "error": "Пост не найден"}
+
         existing = session.execute(
             select(Likes).where(
                 Likes.post_id == post_id,
                 Likes.user_id == current_user.id
             )
-        ).scalar_one_or_none()
-
-        post = session.execute(
-            select(Posts)
-            .where(Posts.id == post_id)
         ).scalar_one_or_none()
 
         if existing:
@@ -623,7 +634,7 @@ def toggle_like(post_id: int, current_user=Depends(get_current_user)):
             select(func.count()).where(Likes.post_id == post_id)
         ).scalar()
 
-    return {"liked": liked, "count": cut_numbers(count)}
+    return {"ok": True, "liked": liked, "count": cut_numbers(count)}
 
 # Логика подписки
 @router.post("/profile/{username}/follow")
@@ -770,19 +781,19 @@ def post_comment(post_id: int, text: str = Form(...), current_user=Depends(get_c
         return {"error": "Длина комментария больше 500 символов"}
 
     with session_factory() as session:
-        session.add(Comments(
-            post_id=post_id,
-            user_id=current_user.id,
-            text=text
-        ))
-
         post = session.execute(
             select(Posts)
             .where(Posts.id == post_id)
         ).scalar_one_or_none()
 
         if not post:
-            return {"error": "not found"}
+            return {"error": "Пост не найден"}
+
+        session.add(Comments(
+            post_id=post_id,
+            user_id=current_user.id,
+            text=text
+        ))
 
         if post.user_id != current_user.id:
             session.add(Pushes(

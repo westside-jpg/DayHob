@@ -4,7 +4,7 @@ document.querySelectorAll('.comment-send-btn').forEach(btn => {
         const postId = wrapper.querySelector('.comment').dataset.postId
         const input = wrapper.querySelector('.comment-input')
         const text = input.value.trim()
-        const error = wrapper.querySelector('.error')  // ← только для этого поста
+        const error = wrapper.querySelector('.error')
         const send_button = btn
 
         if (!text) return
@@ -36,10 +36,22 @@ document.querySelectorAll('.comment-send-btn').forEach(btn => {
         const formData = new FormData()
         formData.append('text', text)
 
-        await fetch(`/post/${postId}/post-comment`, {
+        const EResp = await fetch(`/post/${postId}/post-comment`, {
             method: 'POST',
             body: formData
         })
+
+        if (!EResp.ok) {
+            showToast("Пост удалён", "error")
+            return
+        }
+
+        const EData = await EResp.json()
+
+        if (EData.error) {
+            showToast(EData.error, "error")
+            return
+        }
 
         input.value = ''
         input.style.height = 'auto'

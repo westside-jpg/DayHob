@@ -119,8 +119,10 @@ document.getElementById('apply-changes').addEventListener('click', async () => {
     btn.style.background = 'black'
     btn.style.borderColor = 'black'
 
-    document.getElementById('current-avatar').src = URL.createObjectURL(croppedBlob)
-    document.getElementById('menu-profile-avatar').src = URL.createObjectURL(croppedBlob)
+    if (croppedBlob) {
+        document.getElementById('current-avatar').src = URL.createObjectURL(croppedBlob)
+        document.getElementById('menu-profile-avatar').src = URL.createObjectURL(croppedBlob)
+    }
 
     await new Promise(resolve => setTimeout(resolve, 2000))
 

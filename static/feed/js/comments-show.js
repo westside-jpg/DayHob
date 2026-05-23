@@ -4,14 +4,19 @@ document.querySelectorAll('.comment').forEach(btn => {
         const section = btn.closest('.post-wrapper').querySelector('.comments-section')
         const icon = btn.querySelector('.comment-icon')
 
+        const response = await fetch(`/post/${postId}/comments`)
+        const comments = await response.json()
+
+        if (comments.error) {
+            showToast(comments.error, "error")
+            return
+        }
+
         if (section.classList.contains('open')) {
             section.classList.remove('open')
             icon.src = '/static/feed/images/comment.svg'
             return
         }
-
-        const response = await fetch(`/post/${postId}/comments`)
-        const comments = await response.json()
 
         const list = section.querySelector('.comments-list')
         list.innerHTML = comments.length === 0 ? '<p style="color:gray;font-size:14px">Комментариев пока нет</p>' :
