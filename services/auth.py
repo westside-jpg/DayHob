@@ -97,10 +97,21 @@ def hash_password(password: str):
     hashed_password = hashed_password.decode('utf-8')
     return hashed_password
 
-def register_pending_user(username: str, password: str, email: str) -> str:
+def register_pending_user(username: str, password: str, email: str):
     code = str(random.randint(100000, 999999))
 
     with session_factory() as session:
+        errors = []
+
+        check_is_username_in_pending = session.execute(
+            select(PendingUsers)
+            .where(PendingUsers.username == username)
+        ).scalar_one_or_none()
+
+        if check_is_username_in_pending:
+            errors.append("Такое имя пользователя уже занято")
+            return errors, code
+
         existing = session.execute(
             select(PendingUsers).where(PendingUsers.email == email)
         ).scalar_one_or_none()
@@ -123,7 +134,7 @@ def register_pending_user(username: str, password: str, email: str) -> str:
 
         session.commit()
 
-    return code
+    return None, code
 
 
 def send_verification_email(email: str, code: str):

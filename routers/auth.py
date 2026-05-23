@@ -34,11 +34,13 @@ def login_page_post(
         username: str = Form(...),
         password: str = Form(...),
 ):
-    approve, error = verify_login(username, password)
-    if not approve:
-        return templates.TemplateResponse("auth/login.html", {"request": request, "error": error, "username": username})
+    username_clean = username.strip()
+    approve, error = verify_login(username_clean, password)
 
-    token = create_access_token(username)
+    if not approve:
+        return templates.TemplateResponse("auth/login.html", {"request": request, "error": error, "username": username_clean})
+
+    token = create_access_token(username_clean)
 
     redirect = RedirectResponse("/feed", status_code=303)
 
@@ -76,7 +78,19 @@ def register_page_post(
         )
 
     hashed_password = hash_password(password)
-    code = register_pending_user(username, hashed_password, email_clean)
+    errors, code = register_pending_user(username_clean, hashed_password, email_clean)
+
+    if errors:
+        return templates.TemplateResponse(
+            "auth/register.html",
+            {
+                "request": request,
+                "errors": errors,
+                "username": username,
+                "email": email,
+            }
+        )
+
     send_verification_email(email_clean, code)
     return RedirectResponse(f"/register/email_verification?email={email_clean}", status_code=303)
 
