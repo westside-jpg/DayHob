@@ -98,37 +98,47 @@ document.getElementById('apply-changes').addEventListener('click', async () => {
         formData.append('avatar', croppedBlob, 'avatar.jpg')
     }
 
-    const response = await fetch('/settings/apply', {
-        method: 'POST',
-        body: formData
-    })
+    try {
+        const response = await fetch('/settings/apply', {
+            method: 'POST',
+            body: formData
+        })
 
-    const results = await response.json()
+        const results = await response.json()
 
-    if (results.error) {
-        errorBlock.textContent = results.error
-        errorBlock.style.display = 'block'
-        return
+        if (results.error) {
+            showToast(results.error, 'error')
+            return
+        }
+
+        document.getElementById('preview-avatar').style.display = 'none'
+        document.getElementById('arrow').style.display = 'none'
+
+        btn.textContent = "Изменения сохранены"
+        btn.style.color = 'white'
+        btn.style.background = 'black'
+        btn.style.borderColor = 'black'
+
+        if (croppedBlob) {
+            document.getElementById('current-avatar').src = URL.createObjectURL(croppedBlob)
+            document.getElementById('menu-profile-avatar').src = URL.createObjectURL(croppedBlob)
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 2000))
+
+        btn.textContent = "Применить настройки"
+        btn.style.color = 'black'
+        btn.style.background = 'white'
+        btn.disabled = false
+        btn.style.cursor = 'pointer'
+    } catch (e) {
+        showToast('Не удалось сохранить настройки', 'error')
+    } finally {
+        btn.disabled = false
+        btn.textContent = 'Применить настройки'
+        btn.style.background = 'white'
+        btn.style.color = 'black'
+        btn.style.borderColor = 'black'
+        btn.style.cursor = 'pointer'
     }
-
-    document.getElementById('preview-avatar').style.display = 'none'
-    document.getElementById('arrow').style.display = 'none'
-
-    btn.textContent = "Изменения сохранены"
-    btn.style.color = 'white'
-    btn.style.background = 'black'
-    btn.style.borderColor = 'black'
-
-    if (croppedBlob) {
-        document.getElementById('current-avatar').src = URL.createObjectURL(croppedBlob)
-        document.getElementById('menu-profile-avatar').src = URL.createObjectURL(croppedBlob)
-    }
-
-    await new Promise(resolve => setTimeout(resolve, 2000))
-
-    btn.textContent = "Применить настройки"
-    btn.style.color = 'black'
-    btn.style.background = 'white'
-    btn.disabled = false
-    btn.style.cursor = 'pointer'
 })

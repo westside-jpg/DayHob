@@ -478,6 +478,19 @@ def get_friends_list(request: Request, username: str, current_user=Depends(get_c
             select(Users).where(Users.username == username)
         ).scalar_one_or_none()
 
+        is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
+        if not user:
+            if is_ajax:
+                return JSONResponse(
+                    {"ok": False, "error": "Пользователь не найден"},
+                    status_code=404,
+                )
+            return RedirectResponse("/404", status_code=303)
+
+        if is_ajax:
+            return JSONResponse({"ok": True})
+
         f1 = aliased(Followers)
         f2 = aliased(Followers)
 
@@ -535,6 +548,19 @@ def get_subs_list(request: Request, username: str, current_user=Depends(get_curr
         user = session.execute(
             select(Users).where(Users.username == username)
         ).scalar_one_or_none()
+
+        is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
+        if not user:
+            if is_ajax:
+                return JSONResponse(
+                    {"ok": False, "error": "Пользователь не найден"},
+                    status_code=404,
+                )
+            return RedirectResponse("/404", status_code=303)
+
+        if is_ajax:
+            return JSONResponse({"ok": True})
 
         subs_count = session.execute(
             select(func.count())
@@ -648,7 +674,7 @@ def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
         ).scalar_one_or_none()
 
         if not user:
-            return {"error": "not found"}
+            return {"ok": False, "error": "Пользователь не найден"}
 
         existing = session.execute(
             select(Followers).where(
@@ -763,7 +789,8 @@ def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
 
         unread_pushes_count = unread_pushes_count_func(current_user)
 
-        return {"is_subscribed": is_subscribed,
+        return {"ok": True,
+                "is_subscribed": is_subscribed,
                 "followers_count": cut_numbers(followers_count),
                 "declination_subs": declination_subs(followers_count),
                 "friends_count": cut_numbers(friends_count),
@@ -826,6 +853,9 @@ def update_settings(
         user = session.execute(
             select(Users).where(Users.username == current_user.username)
         ).scalar_one_or_none()
+
+        if not user:
+            return {"error": "Пользователя не существует"}
 
         user.bio = bio
 

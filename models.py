@@ -49,8 +49,8 @@ class Tasks(Base):
 class Posts(Base):
     __tablename__ = "posts"
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    task_id: Mapped[int] = mapped_column(ForeignKey("tasks.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    task_id: Mapped[int] = mapped_column(ForeignKey("tasks.id", ondelete="RESTRICT"), nullable=False)
     text: Mapped[str] = mapped_column(String(1024))
     image_url: Mapped[str | None] = mapped_column(String(500))
     created_at: Mapped[created_at]
@@ -58,14 +58,14 @@ class Posts(Base):
 class Likes(Base):
     __tablename__ = "likes"
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     post_id: Mapped[int] = mapped_column(ForeignKey("posts.id", ondelete="CASCADE"), nullable=False)
     liked_at: Mapped[created_at]
 
 class Comments(Base):
     __tablename__ = "comments"
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     post_id: Mapped[int] = mapped_column(ForeignKey("posts.id", ondelete="CASCADE"), nullable=False)
     text: Mapped[str] = mapped_column(String(500))
     created_at: Mapped[created_at]
@@ -73,8 +73,8 @@ class Comments(Base):
 class Followers(Base):
     __tablename__ = "followers"
     id: Mapped[int] = mapped_column(primary_key=True)
-    follower_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    following_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    follower_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    following_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     followed_at: Mapped[created_at]
 
     __table_args__ = (UniqueConstraint("follower_id", "following_id"),)
@@ -82,8 +82,8 @@ class Followers(Base):
 class Pushes(Base):
     __tablename__ = "pushes"
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    sender_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    sender_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
     post_id: Mapped[int | None] = mapped_column(ForeignKey("posts.id", ondelete="CASCADE"), nullable=True)
     text: Mapped[str] = mapped_column()
     is_read: Mapped[bool] = mapped_column(default=False)

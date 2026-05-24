@@ -21,19 +21,15 @@
                 {% if is_subscribed %}Отписаться{% else %}Подписаться{% endif %}
             </button>
         {% endif %}
-        <div class="stats">
-            <a href="/profile/{{ profile_user.username }}/friends_list">
-                <div class="stats-item">
-                    <p class="stats-number" id="friends-count">{{ friends_count }}<br></p>
-                    <p class="stats-category" id="friends-declination">{{ declination.friends }}</p>
-                </div>
-            </a>
-            <a href="/profile/{{ profile_user.username }}/subs_list">
-                <div class="stats-item">
-                    <p class="stats-number" id="followers-count">{{ followers_count }}<br></p>
-                    <p class="stats-category" id="subs-declination">{{ declination.subs }}</p>
-                </div>
-            </a>
+        <div class="stats" data-username="{{ profile_user.username }}">
+            <div class="stats-item" data-list="friends" style="cursor: pointer">
+                <p class="stats-number" id="friends-count">{{ friends_count }}<br></p>
+                <p class="stats-category" id="friends-declination">{{ declination.friends }}</p>
+            </div>
+            <div class="stats-item" data-list="subs" style="cursor: pointer">
+                <p class="stats-number" id="followers-count">{{ followers_count }}<br></p>
+                <p class="stats-category" id="subs-declination">{{ declination.subs }}</p>
+            </div>
             <div class="stats-item">
                 <p class="stats-number" id="posts-count">{{ posts_count }}<br></p>
                 <p class="stats-category" id="posts-declination">{{ declination.posts }}</p>
@@ -54,5 +50,6 @@
 <script src="/static/feed/js/comments-show.js"></script>
 <script src="/static/feed/js/comment-send.js"></script>
 <script src="/static/feed/js/comment-textarea-extension.js"></script>
+<script src="/static/feed/js/subs-and-friend-list.js"></script>
 
 {% endblock %}
