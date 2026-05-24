@@ -85,6 +85,18 @@ def declination_posts(number):
     else:
         return "постов"
 
+def declination_following(number):
+    n = abs(number)
+    if 11 <= n % 100 <= 14:
+        return "подписок"
+    last_digit = n % 10
+    if last_digit == 1:
+        return "подписка"
+    elif 2 <= last_digit <= 4:
+        return "подписки"
+    else:
+        return "подписок"
+
 def declination_pushes(number):
     n = abs(number)
     if 11 <= n % 100 <= 14:

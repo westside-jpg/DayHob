@@ -1,6 +1,5 @@
 from datetime import date
-from urllib import request
-from fastapi import APIRouter, Request, Form, Depends, Form, UploadFile, File
+from fastapi import APIRouter, Request, Depends, Form, UploadFile, File
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
@@ -11,7 +10,8 @@ from models import Tasks, Posts, Users, Likes, Comments, Followers, Pushes, Push
 from database import session_factory
 from services.dependencies import get_current_user
 from services.feed import time_ago, declination_friends, declination_subs, declination_posts, \
-    cut_numbers, declination_pushes, cut_text, delete_old_pushes, cut_pushes_count, unread_pushes_count_func
+    cut_numbers, declination_pushes, cut_text, delete_old_pushes, cut_pushes_count, unread_pushes_count_func, \
+    declination_following
 from fastapi.responses import JSONResponse
 from services.cloudinary import upload_avatar
 
@@ -238,10 +238,17 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
             .where(f1.follower_id == profile_user.id)
         ).scalar()
 
+        following_count = session.execute(
+            select(func.count())
+            .select_from(Followers)
+            .where(Followers.follower_id == profile_user.id)
+        ).scalar()
+
         declination = {
             "posts": declination_posts(posts_count),
             "subs": declination_subs(followers_count),
-            "friends": declination_friends(friends_count)
+            "friends": declination_friends(friends_count),
+            "following": declination_following(following_count)
         }
 
         is_subscribed_query = session.execute(
@@ -267,6 +274,7 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
             "posts_count": cut_numbers(posts_count),
             "followers_count": cut_numbers(followers_count),
             "friends_count": cut_numbers(friends_count),
+            "following_count": cut_numbers(following_count),
             "declination": declination,
             "unread_pushes_count": cut_pushes_count(unread_pushes_count)
         })
@@ -478,18 +486,10 @@ def get_friends_list(request: Request, username: str, current_user=Depends(get_c
             select(Users).where(Users.username == username)
         ).scalar_one_or_none()
 
-        is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
-
         if not user:
-            if is_ajax:
-                return JSONResponse(
-                    {"ok": False, "error": "Пользователь не найден"},
-                    status_code=404,
-                )
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JSONResponse({"error": "Пользователь не найден"}, status_code=404)
             return RedirectResponse("/404", status_code=303)
-
-        if is_ajax:
-            return JSONResponse({"ok": True})
 
         f1 = aliased(Followers)
         f2 = aliased(Followers)
@@ -528,7 +528,7 @@ def get_friends_list(request: Request, username: str, current_user=Depends(get_c
 
         unread_pushes_count = unread_pushes_count_func(current_user)
 
-        return templates.TemplateResponse("feed/subs_and_friends_list.html", {
+        return templates.TemplateResponse("feed/subs-friends-following-list.html", {
             "request": request,
             "current_user": current_user,
             "count": friends_count,
@@ -549,18 +549,10 @@ def get_subs_list(request: Request, username: str, current_user=Depends(get_curr
             select(Users).where(Users.username == username)
         ).scalar_one_or_none()
 
-        is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
-
         if not user:
-            if is_ajax:
-                return JSONResponse(
-                    {"ok": False, "error": "Пользователь не найден"},
-                    status_code=404,
-                )
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JSONResponse({"error": "Пользователь не найден"}, status_code=404)
             return RedirectResponse("/404", status_code=303)
-
-        if is_ajax:
-            return JSONResponse({"ok": True})
 
         subs_count = session.execute(
             select(func.count())
@@ -588,11 +580,62 @@ def get_subs_list(request: Request, username: str, current_user=Depends(get_curr
 
         unread_pushes_count = unread_pushes_count_func(current_user)
 
-        return templates.TemplateResponse("feed/subs_and_friends_list.html", {
+        return templates.TemplateResponse("feed/subs-friends-following-list.html", {
             "request": request,
             "current_user": current_user,
             "count": subs_count,
             "declination": declination_subs(subs_count),
+            "results": results,
+            "unread_pushes_count": cut_pushes_count(unread_pushes_count)
+        })
+
+# Список подписок пользователя
+@router.get("/profile/{username}/following_list")
+def get_following_list(request: Request, username: str, current_user=Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    with session_factory() as session:
+        user = session.execute(
+            select(Users).where(Users.username == username)
+        ).scalar_one_or_none()
+
+        if not user:
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JSONResponse({"error": "Пользователь не найден"}, status_code=404)
+            return RedirectResponse("/404", status_code=303)
+
+        following_count = session.execute(
+            select(func.count())
+            .select_from(Followers)
+            .where(Followers.follower_id == user.id)
+        ).scalar()
+
+        following_ids = session.execute(
+            select(Followers.following_id)
+            .where(Followers.follower_id == user.id)
+        ).scalars().all()
+
+        rows = session.execute(
+            select(Users)
+            .where(Users.id.in_(following_ids))
+        ).scalars().all()
+
+        results = []
+
+        for result in rows:
+            results.append({
+                "username": result.username,
+                "avatar_url": result.avatar_url,
+            })
+
+        unread_pushes_count = unread_pushes_count_func(current_user)
+
+        return templates.TemplateResponse("feed/subs-friends-following-list.html", {
+            "request": request,
+            "current_user": current_user,
+            "count": following_count,
+            "declination": declination_following(following_count),
             "results": results,
             "unread_pushes_count": cut_pushes_count(unread_pushes_count)
         })

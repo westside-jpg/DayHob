@@ -151,8 +151,10 @@
     text-align: center;
     align-content: center;
     align-items: center;
+    text-align: center;
     justify-content: center;
     transition: all 0.3s ease;
+    cursor: pointer
 }
 
 .stats-item:hover {
@@ -171,10 +173,14 @@
 }
 
 .stats-category {
-    font-size: 28px;
+    font-size: 22px;
     font-weight: 500;
     margin: 0;
     white-space: nowrap;
+}
+
+#following-declination {
+    transform: translateX(-7px);
 }
 
 .post-user-info {

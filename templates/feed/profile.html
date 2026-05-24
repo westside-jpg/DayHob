@@ -22,15 +22,19 @@
             </button>
         {% endif %}
         <div class="stats" data-username="{{ profile_user.username }}">
-            <div class="stats-item" data-list="friends" style="cursor: pointer">
+            <div class="stats-item" data-list="following">
+                <p class="stats-number" id="following-count">{{ following_count }}<br></p>
+                <p class="stats-category" id="following-declination">{{ declination.following }}</p>
+            </div>
+            <div class="stats-item" data-list="friends">
                 <p class="stats-number" id="friends-count">{{ friends_count }}<br></p>
                 <p class="stats-category" id="friends-declination">{{ declination.friends }}</p>
             </div>
-            <div class="stats-item" data-list="subs" style="cursor: pointer">
+            <div class="stats-item" data-list="subs">
                 <p class="stats-number" id="followers-count">{{ followers_count }}<br></p>
                 <p class="stats-category" id="subs-declination">{{ declination.subs }}</p>
             </div>
-            <div class="stats-item">
+            <div class="stats-item" id="posts-stat">
                 <p class="stats-number" id="posts-count">{{ posts_count }}<br></p>
                 <p class="stats-category" id="posts-declination">{{ declination.posts }}</p>
             </div>
@@ -50,6 +54,14 @@
 <script src="/static/feed/js/comments-show.js"></script>
 <script src="/static/feed/js/comment-send.js"></script>
 <script src="/static/feed/js/comment-textarea-extension.js"></script>
-<script src="/static/feed/js/subs-and-friend-list.js"></script>
+<script src="/static/feed/js/subs-friends-following-list.js"></script>
+<!-- Для прокрутки к постам, при нажатии на stats-item постов -->
+<script>
+    document.getElementById('posts-stat').addEventListener('click', () => {
+        const el = document.getElementById('posts-section')
+        const top = el.getBoundingClientRect().top + window.scrollY - 20
+        window.scrollTo({ top: top, behavior: 'smooth' })
+    })
+</script>
 
 {% endblock %}
