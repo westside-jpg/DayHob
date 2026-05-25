@@ -13,7 +13,7 @@ from services.feed import time_ago, declination_friends, declination_subs, decli
     cut_numbers, declination_pushes, cut_text, delete_old_pushes, cut_pushes_count, unread_pushes_count_func, \
     declination_following
 from fastapi.responses import JSONResponse
-from services.cloudinary import upload_avatar
+from services.cloudinary_func import upload_avatar, delete_avatar
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -944,7 +944,9 @@ def delete_post(post_id: int, current_user=Depends(get_current_user)):
 @router.post("/settings/delete-account")
 def delete_account(current_user=Depends(get_current_user)):
     if not current_user:
-        return RedirectResponse("/login", status_code=303)
+        resp = JSONResponse({"ok": False, "error": "Сессия недействительна"})
+        resp.delete_cookie("access_token")
+        return resp
 
     with session_factory() as session:
         user = session.execute(
@@ -953,6 +955,9 @@ def delete_account(current_user=Depends(get_current_user)):
 
         if not user:
             return JSONResponse({"ok": False, "error": "Не удалось удалить аккаунт"})
+
+        if user.avatar_url and "cloudinary.com" in user.avatar_url:
+            delete_avatar(user.username)
 
         session.delete(user)
         session.commit()

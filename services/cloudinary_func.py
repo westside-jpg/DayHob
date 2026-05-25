@@ -20,3 +20,7 @@ def upload_avatar(file, username: str) -> str:
         ]
     )
     return result["secure_url"]
+
+def delete_avatar(username: str) -> None:
+    public_id = f"avatars/{username}"
+    cloudinary.uploader.destroy(public_id, resource_type="image")
