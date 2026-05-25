@@ -37,7 +37,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-bottom: 150px;
 }
 
 .s-avatar p {
@@ -126,6 +125,172 @@
     display: flex;
     justify-content: center;
     background: linear-gradient(to bottom, transparent, white 30%);
+}
+
+.account-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.account-actions-title {
+    font-size: 40px;
+    font-weight: 400;
+}
+
+#delete-account-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+#delete-account-modal.open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.delete-account {
+    width: 250px;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    font-weight: 500;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    color: red;
+    border-radius: 20px;
+    border: 2px solid red;
+    transition: 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 150px;
+}
+
+.delete-account img {
+    width: 24px;
+    height: 24px;
+    transition: filter 0.3s ease;
+}
+
+.delete-account:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    background: red;
+}
+
+.icon-red {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.icon-white {
+    opacity: 0;
+    position: absolute;
+    transition: opacity 0.3s ease;
+}
+
+.delete-account:hover .icon-red {
+    opacity: 0;
+}
+
+.delete-account:hover .icon-white {
+    opacity: 1;
+}
+
+.delete-account:hover p {
+    display: none;
+}
+
+.delete-account:active {
+    transform: scale(1.08);
+    background: #f84141;
+}
+
+.delete-account-confirm {
+    max-width: 500px;
+    max-height: 500px;
+    background: white;
+    position: absolute;
+    justify-self: center;
+    align-self: center;
+    text-align: center;
+    font-weight: 600;
+    font-size: 38px;
+    border: 3px solid #000000;
+    border-radius: 50px;
+}
+
+.delete-account-confirm p {
+    margin: 30px 0;
+}
+
+.delete-account-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.delete-account-buttons p {
+    font-size: 20px;
+    text-align: center;
+    border-radius: 20px;
+    align-content: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-top: 0;
+    margin-bottom: 30px;
+}
+
+.yes {
+    width: 150px;
+    height: 50px;
+    border: 2px solid red;
+    color: red;
+    transition: 0.3s ease;
+}
+
+.no {
+    width: 150px;
+    height: 50px;
+    border: 2px solid black;
+    transition: 0.3s ease;
+}
+
+.yes:hover {
+    transform: scale(1.08);
+    background: red;
+    color: white;
+}
+
+.no:hover {
+    transform: scale(1.08);
+    background: black;
+    color: white;
+}
+
+.yes:active {
+    transform: scale(1.12);
+    background: #f84141;
+}
+
+.no:active {
+    transform: scale(1.12);
+    background: #232323;
 }
 
 .cropper-container {

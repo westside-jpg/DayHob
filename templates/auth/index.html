@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DayHob</title>
-    <link rel="stylesheet" href="../../static/auth/css/index.css">
-    <link rel="shortcut icon" href="../../static/auth/images/logo.svg" type="image/x-icon">
+    <link rel="stylesheet" href="/static/auth/css/index.css">
+    <link rel="shortcut icon" href="/static/auth/images/logo.svg" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
@@ -13,27 +13,28 @@
 <body>
     <header class="header">
         <div>
-            <img src="../../static/auth/images/logo.svg" alt="" class="site-icon">
+            <img src="/static/auth/images/logo.svg" alt="" class="site-icon">
         </div>
     </header>
+    <p class="success-message" style="display:none">Аккаунт успешно удалён</p>
     <div class="carousel">
         <div class="group">
-            <img src="../../static/auth/images/img1.svg" class="card" alt="">
-            <img src="../../static/auth/images/img2.svg" class="card" alt="">
-            <img src="../../static/auth/images/img3.svg" class="card" alt="">
-            <img src="../../static/auth/images/img4.svg" class="card" alt="">
-            <img src="../../static/auth/images/img5.svg" class="card" alt="">
-            <img src="../../static/auth/images/img6.svg" class="card" alt="">
-            <img src="../../static/auth/images/img7.svg" class="card" alt="">
+            <img src="/static/auth/images/img1.svg" class="card" alt="">
+            <img src="/static/auth/images/img2.svg" class="card" alt="">
+            <img src="/static/auth/images/img3.svg" class="card" alt="">
+            <img src="/static/auth/images/img4.svg" class="card" alt="">
+            <img src="/static/auth/images/img5.svg" class="card" alt="">
+            <img src="/static/auth/images/img6.svg" class="card" alt="">
+            <img src="/static/auth/images/img7.svg" class="card" alt="">
         </div>
         <div aria-hidden class="group">
-            <img src="../../static/auth/images/img1.svg" class="card" alt="">
-            <img src="../../static/auth/images/img2.svg" class="card" alt="">
-            <img src="../../static/auth/images/img3.svg" class="card" alt="">
-            <img src="../../static/auth/images/img4.svg" class="card" alt="">
-            <img src="../../static/auth/images/img5.svg" class="card" alt="">
-            <img src="../../static/auth/images/img6.svg" class="card" alt="">
-            <img src="../../static/auth/images/img7.svg" class="card" alt="">
+            <img src="/static/auth/images/img1.svg" class="card" alt="">
+            <img src="/static/auth/images/img2.svg" class="card" alt="">
+            <img src="/static/auth/images/img3.svg" class="card" alt="">
+            <img src="/static/auth/images/img4.svg" class="card" alt="">
+            <img src="/static/auth/images/img5.svg" class="card" alt="">
+            <img src="/static/auth/images/img6.svg" class="card" alt="">
+            <img src="/static/auth/images/img7.svg" class="card" alt="">
         </div>
     </div>
     <footer class="footer">
@@ -47,4 +48,10 @@
         </div>
     </footer>
 </body>
+<script>
+    if (window.location.search.includes('deleted=true')) {
+        document.querySelector('.success-message').style.display = 'block'
+        window.history.replaceState({}, '', '/')
+    }
+</script>
 </html>

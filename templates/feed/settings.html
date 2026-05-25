@@ -26,6 +26,14 @@
         <input type="file" id="avatar-input" style="display:none">
         <button onclick="document.getElementById('avatar-input').click()">Выбрать фото</button>
     </div>
+    <div class="account-actions">
+        <p class="account-actions-title">Действия с аккаунтом</p>
+        <div class="delete-account">
+            <img src="/static/feed/images/trash-red.svg" class="icon-red">
+            <img src="/static/feed/images/trash-white.svg" class="icon-white">
+            <p>Удалить аккаунт</p>
+        </div>
+    </div>
 </div>
 <div class="s-apply-container">
     <button class="s-apply" id="apply-changes" data-username="{{ current_user.username }}">Применить настройки</button>
@@ -36,10 +44,20 @@
         <button id="crop-confirm">Обрезать</button>
     </div>
 </div>
+<div id="delete-account-modal" style="display:none">
+    <div class="delete-account-confirm">
+        <p>Вы точно хотите удалить аккаунт?</p>
+        <div class="delete-account-buttons">
+            <p class="yes" id="delete-yes">Да</p>
+            <p class="no" id="delete-no">Отмена</p>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
 
 {% block scripts %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <script src="/static/feed/js/avatar-catch.js"></script>
+    <script src="/static/feed/js/delete-account.js"></script>
 {% endblock %}

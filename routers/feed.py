@@ -939,3 +939,24 @@ def delete_post(post_id: int, current_user=Depends(get_current_user)):
                 "count": posts_count,
                 "declination": declination_posts(posts_count)
                 }
+
+# Удаление аккаунта
+@router.post("/settings/delete-account")
+def delete_account(current_user=Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    with session_factory() as session:
+        user = session.execute(
+            select(Users).where(Users.username == current_user.username)
+        ).scalar_one_or_none()
+
+        if not user:
+            return JSONResponse({"ok": False, "error": "Не удалось удалить аккаунт"})
+
+        session.delete(user)
+        session.commit()
+
+    response = JSONResponse({"ok": True})
+    response.delete_cookie("access_token")
+    return response
