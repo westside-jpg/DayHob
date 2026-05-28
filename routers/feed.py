@@ -88,9 +88,9 @@ def feed_page_get(request: Request, current_user = Depends(get_current_user)):
             "unread_pushes_count": cut_pushes_count(unread_pushes_count),
         })
 
-# Поиск
+# Поиск людей
 @router.get("/search", response_class=HTMLResponse)
-def search_page_get(request: Request, current_user = Depends(get_current_user)):
+def search_page_users_get(request: Request, current_user = Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
@@ -115,7 +115,7 @@ def search_page_get(request: Request, current_user = Depends(get_current_user)):
         "unread_pushes_count": cut_pushes_count(unread_pushes_count),
     })
 
-# Логика поиска
+# Логика поиска людей
 @router.get("/search/users")
 def search_users(query: str, current_user=Depends(get_current_user)):
     if not current_user:
@@ -130,6 +130,71 @@ def search_users(query: str, current_user=Depends(get_current_user)):
         ).scalars().all()
 
         return [{"username": u.username, "avatar_url": u.avatar_url} for u in users]
+
+# Логика поиска постов
+@router.get("/search/posts")
+def search_posts(query: str = "", current_user=Depends(get_current_user)):
+    if not current_user:
+        return JSONResponse([], status_code=401)
+
+    q = query.strip()
+
+    with session_factory() as session:
+        likes_subq = (
+            select(Likes.post_id, func.count().label("likes_count"))
+            .group_by(Likes.post_id)
+            .subquery("likes_subq")
+        )
+
+        comments_count_subq = (
+            select(Comments.post_id, func.count().label("comments_count"))
+            .group_by(Comments.post_id)
+            .subquery("comments_count_subq")
+        )
+
+        is_liked_subq = (
+            select(Likes.post_id)
+            .where(Likes.user_id == current_user.id)
+            .subquery("is_liked_subq")
+        )
+
+        stmt = (
+            select(Posts, Users, Tasks,
+                   func.coalesce(likes_subq.c.likes_count, 0).label("likes_count"),
+                   func.coalesce(comments_count_subq.c.comments_count, 0).label("comments_count"),
+                   is_liked_subq.c.post_id.isnot(None).label("is_liked"),
+                   )
+            .join(Users, Posts.user_id == Users.id)
+            .join(Tasks, Posts.task_id == Tasks.id)
+            .outerjoin(likes_subq, likes_subq.c.post_id == Posts.id)
+            .outerjoin(comments_count_subq, comments_count_subq.c.post_id == Posts.id)
+            .outerjoin(is_liked_subq, is_liked_subq.c.post_id == Posts.id)
+        )
+
+        if len(q) >= 2:
+            stmt = stmt.where(Posts.text.ilike(f"%{q}%"))
+
+        rows = session.execute(
+            stmt.order_by(Posts.created_at.desc()).limit(30)
+        ).all()
+
+        posts = []
+        for post, author, task_i, likes_count, comments_count, is_liked in rows:
+            posts.append({
+                "id": post.id,
+                "created_at": time_ago(post.created_at),
+                "image_url": post.image_url,
+                "text": post.text,
+                "task_title": task_i.title,
+                "author_username": author.username,
+                "author_avatar": author.avatar_url,
+                "is_liked": is_liked,
+                "likes_count": cut_numbers(likes_count),
+                "comments_count": cut_numbers(comments_count),
+                "current_user": current_user,
+            })
+
+        return posts
 
 # Профиль
 @router.get("/profile/{username}")

@@ -3,32 +3,38 @@
 {% block title %}Поиск{% endblock %}
 {% block styles %}
 <link rel="stylesheet" href="/static/feed/css/search.css">
+<link rel="stylesheet" href="/static/feed/css/components/posts.css">
 {% endblock %}
 
 {% block content %}
 <div class="content">
     <div class="search-input">
-        <input placeholder="Начните вводить имя..." type="text">
+        <input class="search-field" placeholder="Начните вводить имя..." type="text">
     </div>
-    {% if results %}
-        <div class="search-result">
-            {% for result in results %}
+
+    <div class="search-category">
+        <p class="category-element open" data-tab="users">Пользователи</p>
+        <p class="category-element" data-tab="posts">Посты</p>
+    </div>
+
+    <div id="results-container" class="search-result">
+        {% for result in results %}
             <a href="/profile/{{ result.username }}">
                 <div class="result">
                     <img class="result-avatar" src="{{ result.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="">
                     <p class="result-name">{{ result.username }}</p>
                 </div>
             </a>
-            {% endfor %}
-        </div>
-    {% else %}
-    <div class="not-found">
-        <p>Таких пользователей не найдено</p>
+        {% endfor %}
     </div>
-    {% endif %}
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script src="/static/feed/js/search.js"></script>
+<script src="/static/feed/js/likes.js"></script>
+<script src="/static/feed/js/task-info.js"></script>
+<script src="/static/feed/js/comments-show.js"></script>
+<script src="/static/feed/js/comment-send.js"></script>
+<script src="/static/feed/js/comment-textarea-extension.js"></script>
 {% endblock %}
