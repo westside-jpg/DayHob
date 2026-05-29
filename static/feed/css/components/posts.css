@@ -421,3 +421,13 @@
     font-size: 15px;
     font-weight: 400;
 }
+
+.hashtag {
+    color: #2a51a3;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.hashtag:hover {
+    text-decoration: underline;
+}

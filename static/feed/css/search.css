@@ -129,6 +129,12 @@
     margin: 0;
 }
 
-.post-header {
-    padding: 19px 15px 19px 0;
+.hashtag {
+    color: #1a8cff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.hashtag:hover {
+    text-decoration: underline;
 }

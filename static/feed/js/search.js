@@ -67,6 +67,8 @@ async function loadPosts(query) {
         return
     }
     container.innerHTML = `<div class="posts">${posts.map(renderPostCard).join('')}</div>`
+
+    processHashtags();
 }
 
 function renderPostCard(p) {
@@ -82,6 +84,12 @@ function renderPostCard(p) {
                             <p class="post-username">${p.author_username}</p>
                         </a>
                         <p class="post-time">${p.created_at}</p>
+                    </div>
+                    <div class="post-info">
+                        <p class="post-info-btn">i</p>
+                        <div class="post-tooltip">
+                            ${p.task_title}
+                        </div>
                     </div>
                 </div>
                 ${p.image_url ? `<img class="post-image" src="${p.image_url}">` : ''}
@@ -111,4 +119,16 @@ function renderPostCard(p) {
                 <p class="error" style="display:none"></p>
             </div>
         </div>`
+}
+
+const urlParams = new URLSearchParams(window.location.search)
+const q = urlParams.get('q')
+
+if (q) {
+    tabs.forEach(t => t.classList.remove('open'))
+    document.querySelector('[data-tab="posts"]').classList.add('open')
+    activeTab = 'posts'
+    input.placeholder = placeholders.posts
+    input.value = q
+    loadPosts(q)
 }
