@@ -6,12 +6,12 @@ from sqlalchemy import select
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql.expression import and_, update
 from sqlalchemy.sql.functions import func
-from models import Tasks, Posts, Users, Likes, Comments, Followers, Pushes, PushType
+from models import Tasks, Posts, Users, Likes, Comments, Followers, Pushes, PushType, Messages
 from database import session_factory
 from services.dependencies import get_current_user
 from services.feed import time_ago, declination_friends, declination_subs, declination_posts, \
     cut_numbers, declination_pushes, cut_text, delete_old_pushes, cut_pushes_count, unread_pushes_count_func, \
-    declination_following
+    declination_following, declination_messages
 from fastapi.responses import JSONResponse
 from services.cloudinary_func import upload_avatar, delete_avatar
 
@@ -172,7 +172,7 @@ def search_posts(query: str = "", current_user=Depends(get_current_user)):
         )
 
         if len(q) >= 2:
-            stmt = stmt.where(Posts.text.ilike(f"%{q}%"))
+            stmt = stmt.where(func.lower(Posts.text).contains(q.lower()))
 
         rows = session.execute(
             stmt.order_by(Posts.created_at.desc()).limit(30)
@@ -593,7 +593,7 @@ def get_friends_list(request: Request, username: str, current_user=Depends(get_c
 
         unread_pushes_count = unread_pushes_count_func(current_user)
 
-        return templates.TemplateResponse("feed/subs-friends-following-list.html", {
+        return templates.TemplateResponse("feed/users-list.html", {
             "request": request,
             "current_user": current_user,
             "count": friends_count,
@@ -645,7 +645,7 @@ def get_subs_list(request: Request, username: str, current_user=Depends(get_curr
 
         unread_pushes_count = unread_pushes_count_func(current_user)
 
-        return templates.TemplateResponse("feed/subs-friends-following-list.html", {
+        return templates.TemplateResponse("feed/users-list.html", {
             "request": request,
             "current_user": current_user,
             "count": subs_count,
@@ -696,7 +696,7 @@ def get_following_list(request: Request, username: str, current_user=Depends(get
 
         unread_pushes_count = unread_pushes_count_func(current_user)
 
-        return templates.TemplateResponse("feed/subs-friends-following-list.html", {
+        return templates.TemplateResponse("feed/users-list.html", {
             "request": request,
             "current_user": current_user,
             "count": following_count,
@@ -704,6 +704,66 @@ def get_following_list(request: Request, username: str, current_user=Depends(get
             "results": results,
             "unread_pushes_count": cut_pushes_count(unread_pushes_count)
         })
+
+# Список чатов
+@router.get("/chats")
+def get_chats(request: Request, current_user=Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    with session_factory() as session:
+        sent_ids = session.execute(
+            select(Messages.receiver_id)
+            .where(Messages.sender_id == current_user.id)
+        ).scalars().all()
+
+        received_ids = session.execute(
+            select(Messages.sender_id)
+            .where(Messages.receiver_id == current_user.id)
+        ).scalars().all()
+
+        companion_ids = set(sent_ids + received_ids)
+
+        results = []
+        for companion_id in companion_ids:
+            companion = session.get(Users, companion_id)
+
+            messages_count = session.execute(
+                select(func.count())
+                .select_from(Messages)
+                .where(
+                    Messages.sender_id == companion_id,
+                    Messages.receiver_id == current_user.id,
+                    Messages.is_read == False
+                )
+            ).scalar()
+
+            results.append({
+                "username": companion.username,
+                "avatar_url": companion.avatar_url,
+                "messages_count": cut_pushes_count(messages_count),
+            })
+
+        total_unread = session.execute(
+            select(func.count())
+            .select_from(Messages)
+            .where(
+                Messages.receiver_id == current_user.id,
+                Messages.is_read == False
+            )
+        ).scalar()
+
+        unread_pushes_count = unread_pushes_count_func(current_user)
+
+    return templates.TemplateResponse("feed/users-list.html", {
+        "request": request,
+        "current_user": current_user,
+        "results": results,
+        "count": total_unread,
+        "declination": declination_messages(total_unread),
+        "unread_pushes_count": cut_pushes_count(unread_pushes_count),
+        "chats": True,
+    })
 
 # == POST-РУЧКИ == #
 

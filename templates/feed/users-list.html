@@ -3,7 +3,7 @@
 {% block title %}Список пользователей{% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" href="/static/feed/css/subs_and_friends_list.css">
+<link rel="stylesheet" href="/static/feed/css/users-list.css">
 {% endblock %}
 
 {% block content %}
@@ -11,10 +11,15 @@
     <p class="count">{{ count }} {{ declination }}</p>
     <div class="search-result">
         {% for result in results %}
-        <a href="/profile/{{ result.username }}">
+        <a href="/{% if chats %}chats{% else %}profile{% endif %}/{{ result.username }}">
             <div class="result">
                 <img class="result-avatar" src="{{ result.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="">
                 <p class="result-name">{{ result.username }}</p>
+                {% if chats %}
+                    <div class="messages-badge">
+                        {{ result.messages_count }}
+                    </div>
+                {% endif %}
             </div>
         </a>
         {% endfor %}

@@ -137,3 +137,12 @@
 .push-icon-wrapper img {
     padding-top: 4px;
 }
+
+.chats.active {
+    background: black;
+    color: white;
+}
+
+.chats.active img {
+    filter: invert(1);
+}

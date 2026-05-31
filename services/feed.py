@@ -109,6 +109,18 @@ def declination_pushes(number):
     else:
         return "новых уведомлений"
 
+def declination_messages(number):
+    n = abs(number)
+    if 11 <= n % 100 <= 14:
+        return "новых сообщений"
+    last_digit = n % 10
+    if last_digit == 1:
+        return "новое сообщение"
+    elif 2 <= last_digit <= 4:
+        return "новых сообщения"
+    else:
+        return "новых сообщений"
+
 def cut_text(text):
     if not text:
         return ""

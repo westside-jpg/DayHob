@@ -17,9 +17,16 @@
             <p class="bio">{{ profile_user.bio | replace('\n', '<br>') | safe }}</p>
         {% endif %}
         {% if not is_own_profile %}
-            <button class="follow-btn {% if is_subscribed %}unfollow{% endif %}" data-username="{{ profile_user.username }}">
-                {% if is_subscribed %}Отписаться{% else %}Подписаться{% endif %}
-            </button>
+            <div class="profile-buttons">
+                <button class="follow-btn {% if is_subscribed %}unfollow{% endif %}" data-username="{{ profile_user.username }}">
+                    {% if is_subscribed %}Отписаться{% else %}Подписаться{% endif %}
+                </button>
+                <a href="/chats/{{ profile_user.username }}">
+                    <div class="message">
+                        <img src="/static/feed/images/chats.svg" alt="" class="message-icon">
+                    </div>
+                </a>
+            </div>
         {% endif %}
         <div class="stats" data-username="{{ profile_user.username }}">
             <div class="stats-item" data-list="following">

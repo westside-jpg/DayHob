@@ -89,3 +89,12 @@ class Pushes(Base):
     is_read: Mapped[bool] = mapped_column(default=False)
     type: Mapped[PushType] = mapped_column(SqlEnum(PushType), nullable=False)
     created_at: Mapped[created_at]
+
+class Messages(Base):
+    __tablename__ = "messages"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    sender_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    receiver_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    text: Mapped[str] = mapped_column(String(2000), nullable=False)
+    is_read: Mapped[bool] = mapped_column(default=False)
+    created_at: Mapped[created_at]
