@@ -765,6 +765,15 @@ def get_chats(request: Request, current_user=Depends(get_current_user)):
         "chats": True,
     })
 
+@router.get("/chats/{username}")
+def get_chat_with_user(username: str, request: Request, current_user=Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    return templates.TemplateResponse("feed/chats.html", {
+        "request": request,
+        "current_user": current_user,
+    })
 # == POST-РУЧКИ == #
 
 # Логика лайка

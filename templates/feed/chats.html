@@ -1,16 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Чаты</title>
-    <link rel="stylesheet" href="../../static/feed/css/chats.css">
-    <link rel="shortcut icon" href="../../static/feed/images/logo.svg" type="image/x-icon">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
-</head>
-<body>
+{% extends "feed/base.html" %}
 
-</body>
-</html>
+{% block title %}Чат с{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="/static/feed/css/chats.css">
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-header">
+        <div class="back-button">
+            <img src="/static/feed/images/back.svg" alt="">
+        </div>
+        <div class="header-info">
+            <img src="/static/feed/images/test-photo.jpeg" alt="">
+            <p>natalie</p>
+        </div>
+    </div>
+    <div class="chat-messages">
+        <div class="companion-messages">
+            <p class="companion-message">
+                Я тебя не понимаю... Мы сегодня идем на шашлыки? Сколько можно уже ждать?
+            </p>
+            <p class="companion-message-time">
+                18:36
+            </p>
+        </div>
+        <div class="user-messages">
+            <p class="user-message">
+                ДА, ИДЕМ!!
+            </p>
+            <p class="user-message-time">
+                18:37
+            </p>
+        </div>
+    </div>
+    <div class="chat-footer">
+        <input placeholder="Напишите сообщение...">
+        <div class="send-message">
+            <img src="/static/feed/images/send.svg" alt="">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+
+{% endblock %}
