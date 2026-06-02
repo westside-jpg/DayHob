@@ -1,19 +1,21 @@
+import json
 from datetime import date
-from fastapi import APIRouter, Request, Depends, Form, UploadFile, File
+from fastapi import APIRouter, Request, Depends, Form, UploadFile, File, WebSocket, WebSocketDisconnect
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import aliased
-from sqlalchemy.sql.expression import and_, update
+from sqlalchemy.sql.expression import and_, update, asc
 from sqlalchemy.sql.functions import func
 from models import Tasks, Posts, Users, Likes, Comments, Followers, Pushes, PushType, Messages
 from database import session_factory
 from services.dependencies import get_current_user
 from services.feed import time_ago, declination_friends, declination_subs, declination_posts, \
     cut_numbers, declination_pushes, cut_text, delete_old_pushes, cut_pushes_count, unread_pushes_count_func, \
-    declination_following, declination_messages
+    declination_following, declination_messages, format_time_H_M, unread_messages_count_func
 from fastapi.responses import JSONResponse
 from services.cloudinary_func import upload_avatar, delete_avatar
+from services.websocket_manager import manager
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -79,6 +81,7 @@ def feed_page_get(request: Request, current_user = Depends(get_current_user)):
             })
 
         unread_pushes_count = unread_pushes_count_func(current_user)
+        unread_messages_count = unread_messages_count_func(current_user)
 
         return templates.TemplateResponse("feed/feed.html", {
             "request": request,
@@ -86,6 +89,7 @@ def feed_page_get(request: Request, current_user = Depends(get_current_user)):
             "posts": posts,
             "current_user": current_user,
             "unread_pushes_count": cut_pushes_count(unread_pushes_count),
+            "unread_messages_count": cut_numbers(unread_messages_count),
         })
 
 # Поиск людей
@@ -107,12 +111,14 @@ def search_page_users_get(request: Request, current_user = Depends(get_current_u
             })
 
     unread_pushes_count = unread_pushes_count_func(current_user)
+    unread_messages_count = unread_messages_count_func(current_user)
 
     return templates.TemplateResponse("feed/search.html", {
         "request": request,
         "current_user": current_user,
         "results": results,
         "unread_pushes_count": cut_pushes_count(unread_pushes_count),
+        "unread_messages_count": cut_numbers(unread_messages_count),
     })
 
 # Логика поиска людей
@@ -328,6 +334,7 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
             is_subscribed = True
 
         unread_pushes_count = unread_pushes_count_func(current_user)
+        unread_messages_count = unread_messages_count_func(current_user)
 
         return templates.TemplateResponse("feed/profile.html", {
             "request": request,
@@ -341,7 +348,8 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
             "friends_count": cut_numbers(friends_count),
             "following_count": cut_numbers(following_count),
             "declination": declination,
-            "unread_pushes_count": cut_pushes_count(unread_pushes_count)
+            "unread_pushes_count": cut_pushes_count(unread_pushes_count),
+            "unread_messages_count": cut_pushes_count(unread_messages_count),
         })
 
 @router.get("/post/{post_id}/comments")
@@ -382,11 +390,13 @@ def get_settings(request: Request, current_user=Depends(get_current_user)):
         return RedirectResponse("/login", status_code=303)
 
     unread_pushes_count = unread_pushes_count_func(current_user)
+    unread_messages_count = unread_messages_count_func(current_user)
 
     return templates.TemplateResponse("feed/settings.html", {
         "request": request,
         "current_user": current_user,
-        "unread_pushes_count": cut_pushes_count(unread_pushes_count)
+        "unread_pushes_count": cut_pushes_count(unread_pushes_count),
+        "unread_messages_count": cut_pushes_count(unread_messages_count),
     })
 
 # Друзья
@@ -467,6 +477,7 @@ def get_friends(request: Request, current_user=Depends(get_current_user)):
             })
 
         unread_pushes_count = unread_pushes_count_func(current_user)
+        unread_messages_count = unread_messages_count_func(current_user)
 
         return templates.TemplateResponse("feed/friends.html", {
             "request": request,
@@ -474,7 +485,8 @@ def get_friends(request: Request, current_user=Depends(get_current_user)):
             "current_user": current_user,
             "friends_count": friends_count,
             "friends_declination": declination_friends(friends_count),
-            "unread_pushes_count": cut_pushes_count(unread_pushes_count)
+            "unread_pushes_count": cut_pushes_count(unread_pushes_count),
+            "unread_messages_count": cut_pushes_count(unread_messages_count),
         })
 
 # Пуши
@@ -592,6 +604,7 @@ def get_friends_list(request: Request, username: str, current_user=Depends(get_c
             })
 
         unread_pushes_count = unread_pushes_count_func(current_user)
+        unread_messages_count = unread_messages_count_func(current_user)
 
         return templates.TemplateResponse("feed/users-list.html", {
             "request": request,
@@ -599,7 +612,8 @@ def get_friends_list(request: Request, username: str, current_user=Depends(get_c
             "count": friends_count,
             "declination": declination_friends(friends_count),
             "results": results,
-            "unread_pushes_count": cut_pushes_count(unread_pushes_count)
+            "unread_pushes_count": cut_pushes_count(unread_pushes_count),
+            "unread_messages_count": cut_pushes_count(unread_messages_count),
         })
 
 
@@ -644,6 +658,7 @@ def get_subs_list(request: Request, username: str, current_user=Depends(get_curr
             })
 
         unread_pushes_count = unread_pushes_count_func(current_user)
+        unread_messages_count = unread_messages_count_func(current_user)
 
         return templates.TemplateResponse("feed/users-list.html", {
             "request": request,
@@ -651,7 +666,8 @@ def get_subs_list(request: Request, username: str, current_user=Depends(get_curr
             "count": subs_count,
             "declination": declination_subs(subs_count),
             "results": results,
-            "unread_pushes_count": cut_pushes_count(unread_pushes_count)
+            "unread_pushes_count": cut_pushes_count(unread_pushes_count),
+            "unread_messages_count": cut_pushes_count(unread_messages_count),
         })
 
 # Список подписок пользователя
@@ -695,6 +711,7 @@ def get_following_list(request: Request, username: str, current_user=Depends(get
             })
 
         unread_pushes_count = unread_pushes_count_func(current_user)
+        unread_messages_count = unread_messages_count_func(current_user)
 
         return templates.TemplateResponse("feed/users-list.html", {
             "request": request,
@@ -702,7 +719,8 @@ def get_following_list(request: Request, username: str, current_user=Depends(get
             "count": following_count,
             "declination": declination_following(following_count),
             "results": results,
-            "unread_pushes_count": cut_pushes_count(unread_pushes_count)
+            "unread_pushes_count": cut_pushes_count(unread_pushes_count),
+            "unread_messages_count": cut_pushes_count(unread_messages_count),
         })
 
 # Список чатов
@@ -770,10 +788,67 @@ def get_chat_with_user(username: str, request: Request, current_user=Depends(get
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
+    with session_factory() as session:
+        companion = session.execute(
+            select(Users)
+            .where(Users.username == username)
+        ).scalar()
+
+        companion_messages_query = session.execute(
+            select(Messages)
+            .where(Messages.sender_id == companion.id, Messages.receiver_id == current_user.id)
+            .order_by(asc(Messages.created_at))
+        ).scalars().all()
+
+        user_messages_query = session.execute(
+            select(Messages)
+            .where(Messages.sender_id == current_user.id, Messages.receiver_id == companion.id)
+            .order_by(asc(Messages.created_at))
+        ).scalars().all()
+
+        all_messages = []
+
+        for message in user_messages_query:
+            all_messages.append({
+                "text": message.text,
+                "time": format_time_H_M(message.created_at),
+                "created_at": message.created_at,
+                "is_mine": True
+            })
+
+        for message in companion_messages_query:
+            all_messages.append({
+                "text": message.text,
+                "time": format_time_H_M(message.created_at),
+                "created_at": message.created_at,
+                "is_mine": False
+            })
+
+        all_messages.sort(key=lambda m: m["created_at"])
+
+        unread_pushes_count = unread_pushes_count_func(current_user)
+
+        session.execute(
+            update(Messages)
+            .where(
+                Messages.sender_id == companion.id,
+                Messages.receiver_id == current_user.id,
+                Messages.is_read == False
+            )
+            .values(is_read=True)
+        )
+
+        session.commit()
+
     return templates.TemplateResponse("feed/chats.html", {
+        "all_messages": all_messages,
+        "companion": companion,
         "request": request,
         "current_user": current_user,
+        "unread_pushes_count": cut_pushes_count(unread_pushes_count),
+        "chats": True,
     })
+
 # == POST-РУЧКИ == #
 
 # Логика лайка
@@ -1099,3 +1174,51 @@ def delete_account(current_user=Depends(get_current_user)):
     response = JSONResponse({"ok": True})
     response.delete_cookie("access_token")
     return response
+
+
+# == WEBSOCKETS ==
+
+@router.websocket("/chats/{username}/ws")
+async def websocket_endpoint(username: str, websocket: WebSocket, current_user=Depends(get_current_user)):
+    if not current_user:
+        await websocket.close()
+        return
+
+    await manager.connect(current_user.id, websocket)
+
+    try:
+        while True:
+            data = await websocket.receive_text()
+            message_data = json.loads(data)
+            text = message_data.get("text", "").strip()
+            if not text:
+                continue
+
+            with session_factory() as session:
+                companion = session.execute(
+                    select(Users).where(Users.username == username)
+                ).scalar_one_or_none()
+
+                if not companion:
+                    continue
+
+                msg = Messages(
+                    sender_id=current_user.id,
+                    receiver_id=companion.id,
+                    text=text
+                )
+                session.add(msg)
+                session.commit()
+                session.refresh(msg)
+
+                companion_id = companion.id
+                time_str = format_time_H_M(msg.created_at)
+
+            await manager.send_to_user(companion_id, {
+                "text": text,
+                "time": time_str,
+                "is_mine": False
+            })
+
+    except WebSocketDisconnect:
+        manager.disconnect(current_user.id)

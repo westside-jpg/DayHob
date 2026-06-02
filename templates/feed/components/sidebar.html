@@ -27,8 +27,13 @@
     </a>
     <a href="/chats">
         <div class="chats {% if chats %}active{% endif %}">
-            <img src="/static/feed/images/chats.svg" alt="">
-            <p class="menu-text">Чаты</p>
+            <div class="chats-icon-wrapper">
+                <img src="/static/feed/images/chats.svg" alt="">
+                <div class="chats-badge" id="chats-badge">
+                    {{ unread_pushes_count }}
+                </div>
+            </div>
+                <p class="menu-text">Чаты</p>
         </div>
     </a>
     <div class="daily">

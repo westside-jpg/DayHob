@@ -1,6 +1,6 @@
 {% extends "feed/base.html" %}
 
-{% block title %}Чат с{% endblock %}
+{% block title %}Чат с {{companion.username}}{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="/static/feed/css/chats.css">
@@ -9,34 +9,35 @@
 {% block content %}
 <div class="chat-container">
     <div class="chat-header">
-        <div class="back-button">
+        <a class="back-button" href="/chats">
             <img src="/static/feed/images/back.svg" alt="">
-        </div>
-        <div class="header-info">
-            <img src="/static/feed/images/test-photo.jpeg" alt="">
-            <p>natalie</p>
-        </div>
+        </a>
+        <a class="header-info" href="/profile/{{ companion.username }}">
+            <img src="{{ companion.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="">
+            <p>{{ companion.username }}</p>
+        </a>
     </div>
     <div class="chat-messages">
-        <div class="companion-messages">
-            <p class="companion-message">
-                Я тебя не понимаю... Мы сегодня идем на шашлыки? Сколько можно уже ждать?
-            </p>
-            <p class="companion-message-time">
-                18:36
-            </p>
-        </div>
-        <div class="user-messages">
-            <p class="user-message">
-                ДА, ИДЕМ!!
-            </p>
-            <p class="user-message-time">
-                18:37
-            </p>
-        </div>
+        {% for message in all_messages %}
+            {% if message.is_mine %}
+                <div class="user-messages">
+                    <p class="user-message">{{ message.text }}</p>
+                    <p class="user-message-time">{{ message.time }}</p>
+                </div>
+            {% else %}
+                <div class="companion-messages">
+                    <p class="companion-message">{{ message.text }}</p>
+                    <p class="companion-message-time">{{ message.time }}</p>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div id="scroll-btn">
+        <span id="scroll-count"></span>
+        <img src="/static/feed/images/arrow-down.svg" alt="">
     </div>
     <div class="chat-footer">
-        <input placeholder="Напишите сообщение...">
+        <textarea class="message-input" placeholder="Напишите сообщение..." rows="1"></textarea>
         <div class="send-message">
             <img src="/static/feed/images/send.svg" alt="">
         </div>
@@ -45,5 +46,5 @@
 {% endblock %}
 
 {% block scripts %}
-
+<script src="/static/feed/js/chats.js"></script>
 {% endblock %}

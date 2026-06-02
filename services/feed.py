@@ -6,7 +6,7 @@ from sqlalchemy.sql.expression import select, delete
 from sqlalchemy.sql.functions import func
 
 from database import session_factory
-from models import Pushes, created_at
+from models import Pushes, created_at, Messages
 
 
 def time_ago(dt):
@@ -164,3 +164,20 @@ def unread_pushes_count_func(current_user):
         ).scalar_one_or_none()
 
         return count
+
+def unread_messages_count_func(current_user):
+    with session_factory() as session:
+        count = session.execute(
+            select(func.count())
+            .select_from(Messages)
+            .where(
+                Messages.receiver_id == current_user.id,
+                Messages.is_read == False,
+            )
+        ).scalar_one_or_none()
+
+        return count
+
+
+def format_time_H_M(dt: datetime):
+    return dt.strftime("%H:%M")

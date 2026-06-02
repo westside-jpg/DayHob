@@ -9,4 +9,4 @@ sync_engine = create_engine(
     max_overflow=10,
 )
 
-session_factory = sessionmaker(sync_engine)
+session_factory = sessionmaker(sync_engine, expire_on_commit=False)

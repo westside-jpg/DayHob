@@ -138,6 +138,33 @@
     padding-top: 4px;
 }
 
+.chats-icon-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.chats-badge {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: black;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.chats-icon-wrapper img {
+    padding-top: 4px;
+}
+
 .chats.active {
     background: black;
     color: white;

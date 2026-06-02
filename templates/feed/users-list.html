@@ -15,7 +15,7 @@
             <div class="result">
                 <img class="result-avatar" src="{{ result.avatar_url or '/static/feed/images/default_avatar.svg' }}" alt="">
                 <p class="result-name">{{ result.username }}</p>
-                {% if chats %}
+                {% if chats and result.messages_count != "0" %}
                     <div class="messages-badge">
                         {{ result.messages_count }}
                     </div>
