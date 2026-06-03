@@ -1,5 +1,4 @@
 from fastapi import WebSocket
-from typing import Dict
 from collections import defaultdict
 
 class ConnectionManager:

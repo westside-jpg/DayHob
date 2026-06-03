@@ -1,3 +1,4 @@
+import asyncio
 import json
 from datetime import date
 from fastapi import APIRouter, Request, Depends, Form, UploadFile, File, WebSocket, WebSocketDisconnect
@@ -24,14 +25,16 @@ templates = Jinja2Templates(directory="templates")
 
 # Лента
 @router.get("/feed", response_class=HTMLResponse)
-def feed_page_get(request: Request, current_user = Depends(get_current_user)):
+async def feed_page_get(request: Request, current_user = Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
-    with session_factory() as session:
-        task = session.execute(
+    async with session_factory() as session:
+        task_Q = await session.execute(
             select(Tasks).where(Tasks.date == date.today())
-        ).scalar_one_or_none()
+        )
+
+        task = task_Q.scalar_one_or_none()
 
         likes_subq = (
             select(Likes.post_id, func.count().label("likes_count"))
@@ -51,7 +54,7 @@ def feed_page_get(request: Request, current_user = Depends(get_current_user)):
             .subquery("is_liked_subq")
         )
 
-        rows = session.execute(
+        rows_Q = await session.execute(
             select(Posts, Users, Tasks,
                    func.coalesce(likes_subq.c.likes_count, 0).label("likes_count"),
                    func.coalesce(comments_count_subq.c.comments_count, 0).label("comments_count"),
@@ -62,56 +65,60 @@ def feed_page_get(request: Request, current_user = Depends(get_current_user)):
             .outerjoin(likes_subq, likes_subq.c.post_id == Posts.id)
             .outerjoin(comments_count_subq, comments_count_subq.c.post_id == Posts.id)
             .outerjoin(is_liked_subq, is_liked_subq.c.post_id == Posts.id)
-        ).all()
+        )
 
-        posts = []
-        for post, author, task_i, likes_count, comments_count, is_liked in rows:
-            posts.append({
-                "id": post.id,
-                "created_at": time_ago(post.created_at),
-                "image_url": post.image_url,
-                "text": post.text,
-                "task_id": post.task_id,
-                "task_title": task_i.title,
-                "author_username": author.username,
-                "author_avatar": author.avatar_url,
-                "is_liked": is_liked,
-                "likes_count": likes_count,
-                "comments_count": comments_count
-            })
+    rows = rows_Q.all()
 
-        unread_pushes_count = unread_pushes_count_func(current_user)
-        unread_messages_count = unread_messages_count_func(current_user)
-
-        return templates.TemplateResponse("feed/feed.html", {
-            "request": request,
-            "task": task,
-            "posts": posts,
-            "current_user": current_user,
-            "unread_pushes_count": cut_pushes_count(unread_pushes_count),
-            "unread_messages_count": cut_numbers(unread_messages_count),
+    posts = []
+    for post, author, task_i, likes_count, comments_count, is_liked in rows:
+        posts.append({
+            "id": post.id,
+            "created_at": time_ago(post.created_at),
+            "image_url": post.image_url,
+            "text": post.text,
+            "task_id": post.task_id,
+            "task_title": task_i.title,
+            "author_username": author.username,
+            "author_avatar": author.avatar_url,
+            "is_liked": is_liked,
+            "likes_count": likes_count,
+            "comments_count": comments_count
         })
+
+    unread_pushes_count = await unread_pushes_count_func(current_user)
+    unread_messages_count = await unread_messages_count_func(current_user)
+
+    return templates.TemplateResponse("feed/feed.html", {
+        "request": request,
+        "task": task,
+        "posts": posts,
+        "current_user": current_user,
+        "unread_pushes_count": cut_pushes_count(unread_pushes_count),
+        "unread_messages_count": cut_numbers(unread_messages_count),
+    })
 
 # Поиск людей
 @router.get("/search", response_class=HTMLResponse)
-def search_page_users_get(request: Request, current_user = Depends(get_current_user)):
+async def search_page_users_get(request: Request, current_user = Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
-    with session_factory() as session:
-        rows = session.execute(
+    async with session_factory() as session:
+        rows_Q = await session.execute(
             select(Users).where(Users.username != current_user.username)
-        ).scalars().all()
+        )
 
-        results = []
-        for result in rows:
-            results.append({
-                "avatar_url": result.avatar_url,
-                "username": result.username
-            })
+        rows = rows_Q.scalars().all()
 
-    unread_pushes_count = unread_pushes_count_func(current_user)
-    unread_messages_count = unread_messages_count_func(current_user)
+    results = []
+    for result in rows:
+        results.append({
+            "avatar_url": result.avatar_url,
+            "username": result.username
+        })
+
+    unread_pushes_count = await unread_pushes_count_func(current_user)
+    unread_messages_count = await unread_messages_count_func(current_user)
 
     return templates.TemplateResponse("feed/search.html", {
         "request": request,
@@ -123,29 +130,31 @@ def search_page_users_get(request: Request, current_user = Depends(get_current_u
 
 # Логика поиска людей
 @router.get("/search/users")
-def search_users(query: str, current_user=Depends(get_current_user)):
+async def search_users(query: str, current_user=Depends(get_current_user)):
     if not current_user:
         return JSONResponse([], status_code=401)
 
-    with session_factory() as session:
-        users = session.execute(
+    async with session_factory() as session:
+        users_Q = await session.execute(
             select(Users).where(
                 Users.username.ilike(f"%{query}%"),
                 Users.username != current_user.username
             )
-        ).scalars().all()
+        )
+
+        users = users_Q.scalars().all()
 
         return [{"username": u.username, "avatar_url": u.avatar_url} for u in users]
 
 # Логика поиска постов
 @router.get("/search/posts")
-def search_posts(query: str = "", current_user=Depends(get_current_user)):
+async def search_posts(query: str = "", current_user=Depends(get_current_user)):
     if not current_user:
         return JSONResponse([], status_code=401)
 
     q = query.strip()
 
-    with session_factory() as session:
+    async with session_factory() as session:
         likes_subq = (
             select(Likes.post_id, func.count().label("likes_count"))
             .group_by(Likes.post_id)
@@ -180,53 +189,48 @@ def search_posts(query: str = "", current_user=Depends(get_current_user)):
         if len(q) >= 2:
             stmt = stmt.where(func.lower(Posts.text).contains(q.lower()))
 
-        rows = session.execute(
+        rows_Q = await session.execute(
             stmt.order_by(Posts.created_at.desc()).limit(30)
-        ).all()
+        )
 
-        posts = []
-        for post, author, task_i, likes_count, comments_count, is_liked in rows:
-            posts.append({
-                "id": post.id,
-                "created_at": time_ago(post.created_at),
-                "image_url": post.image_url,
-                "text": post.text,
-                "task_title": task_i.title,
-                "author_username": author.username,
-                "author_avatar": author.avatar_url,
-                "is_liked": is_liked,
-                "likes_count": cut_numbers(likes_count),
-                "comments_count": cut_numbers(comments_count),
-                "current_user": current_user,
-            })
+        rows = rows_Q.all()
 
-        return posts
+    posts = []
+    for post, author, task_i, likes_count, comments_count, is_liked in rows:
+        posts.append({
+            "id": post.id,
+            "created_at": time_ago(post.created_at),
+            "image_url": post.image_url,
+            "text": post.text,
+            "task_title": task_i.title,
+            "author_username": author.username,
+            "author_avatar": author.avatar_url,
+            "is_liked": is_liked,
+            "likes_count": cut_numbers(likes_count),
+            "comments_count": cut_numbers(comments_count),
+            "current_user": current_user,
+        })
+
+    return posts
 
 # Профиль
 @router.get("/profile/{username}")
-def profile_page_get(request: Request, username: str, current_user = Depends(get_current_user)):
+async def profile_page_get(request: Request, username: str, current_user = Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
-    with session_factory() as session:
+    async with session_factory() as session:
         # Профиль
-        profile_user = session.execute(
+        profile_user_Q = await session.execute(
             select(Users).where(Users.username == username)
-        ).scalar_one_or_none()
+        )
+
+        profile_user = profile_user_Q.scalar_one_or_none()
 
         if not profile_user:
             return RedirectResponse("/404", status_code=303)
 
-        # Определение флагов
         is_own_profile = (current_user.id == profile_user.id)
-        is_following = False
-        if not is_own_profile:
-            is_following = session.execute(
-                select(Followers).where(
-                    Followers.follower_id == current_user.id,
-                    Followers.following_id == profile_user.id
-                )
-            ).scalar_one_or_none() is not None
 
         # Посты
         likes_subq = (
@@ -264,7 +268,8 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
         )
 
 
-        rows = session.execute(posts_query).all()
+        rows_Q = await session.execute(posts_query)
+        rows = rows_Q.all()
 
         posts_data = []
 
@@ -285,18 +290,22 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
             })
 
         # Статистика
-        posts_count = session.execute(
-            select(func.count()).where(Posts.user_id == profile_user.id)
-        ).scalar()
+        posts_count_Q = await session.execute(
+            select(func.count()).select_from(Posts).where(Posts.user_id == profile_user.id)
+        )
 
-        followers_count = session.execute(
-            select(func.count()).where(Followers.following_id == profile_user.id)
-        ).scalar()
+        posts_count = posts_count_Q.scalar()
+
+        followers_count_Q = await session.execute(
+            select(func.count()).select_from(Followers).where(Followers.following_id == profile_user.id)
+        )
+
+        followers_count = followers_count_Q.scalar()
 
         f1 = aliased(Followers)
         f2 = aliased(Followers)
 
-        friends_count = session.execute(
+        friends_count_Q = await session.execute(
             select(func.count())
             .select_from(f1)
             .join(
@@ -307,13 +316,17 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
                 )
             )
             .where(f1.follower_id == profile_user.id)
-        ).scalar()
+        )
 
-        following_count = session.execute(
+        friends_count = friends_count_Q.scalar()
+
+        following_count_Q = await session.execute(
             select(func.count())
             .select_from(Followers)
             .where(Followers.follower_id == profile_user.id)
-        ).scalar()
+        )
+
+        following_count = following_count_Q.scalar()
 
         declination = {
             "posts": declination_posts(posts_count),
@@ -322,19 +335,21 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
             "following": declination_following(following_count)
         }
 
-        is_subscribed_query = session.execute(
+        is_subscribed_query_Q = await session.execute(
             select(Followers).where(
                 Followers.follower_id == current_user.id,
                 Followers.following_id == profile_user.id)
-        ).scalar_one_or_none()
+        )
+
+        is_subscribed_query = is_subscribed_query_Q.scalar_one_or_none()
 
         if not is_subscribed_query:
             is_subscribed = False
         else:
             is_subscribed = True
 
-        unread_pushes_count = unread_pushes_count_func(current_user)
-        unread_messages_count = unread_messages_count_func(current_user)
+        unread_pushes_count = await unread_pushes_count_func(current_user)
+        unread_messages_count = await unread_messages_count_func(current_user)
 
         return templates.TemplateResponse("feed/profile.html", {
             "request": request,
@@ -353,25 +368,29 @@ def profile_page_get(request: Request, username: str, current_user = Depends(get
         })
 
 @router.get("/post/{post_id}/comments")
-def get_comments(post_id: int, current_user=Depends(get_current_user)):
+async def get_comments(post_id: int, current_user=Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
-    with session_factory() as session:
-        post = session.execute(
+    async with session_factory() as session:
+        post_Q = await session.execute(
             select(Posts)
             .where(Posts.id == post_id)
-        ).scalar_one_or_none()
+        )
+
+        post = post_Q.scalar_one_or_none()
 
         if not post:
             return {"error": "Пост не найден"}
 
-        rows = session.execute(
+        rows_Q = await session.execute(
             select(Comments, Users)
             .join(Users, Comments.user_id == Users.id)
             .where(Comments.post_id == post_id)
             .order_by(Comments.created_at)
-        ).all()
+        )
+
+        rows = rows_Q.all()
 
         return [
             {
@@ -385,12 +404,12 @@ def get_comments(post_id: int, current_user=Depends(get_current_user)):
 
 # Настройки
 @router.get("/settings")
-def get_settings(request: Request, current_user=Depends(get_current_user)):
+async def get_settings(request: Request, current_user=Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
-    unread_pushes_count = unread_pushes_count_func(current_user)
-    unread_messages_count = unread_messages_count_func(current_user)
+    unread_pushes_count = await unread_pushes_count_func(current_user)
+    unread_messages_count = await unread_messages_count_func(current_user)
 
     return templates.TemplateResponse("feed/settings.html", {
         "request": request,
@@ -401,15 +420,15 @@ def get_settings(request: Request, current_user=Depends(get_current_user)):
 
 # Друзья
 @router.get("/friends")
-def get_friends(request: Request, current_user=Depends(get_current_user)):
+async def get_friends(request: Request, current_user=Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
-    with session_factory() as session:
+    async with session_factory() as session:
         f1 = aliased(Followers)
         f2 = aliased(Followers)
 
-        friends_count = session.execute(
+        friends_count_Q = await session.execute(
             select(func.count())
             .select_from(f1)
             .join(f2, and_(
@@ -417,16 +436,20 @@ def get_friends(request: Request, current_user=Depends(get_current_user)):
                 f2.following_id == current_user.id
             ))
             .where(f1.follower_id == current_user.id)
-        ).scalar()
+        )
 
-        friends_ids = session.execute(
+        friends_count = friends_count_Q.scalar()
+
+        friends_ids_Q = await session.execute(
             select(f1.following_id)
             .join(f2, and_(
                 f1.following_id == f2.follower_id,
                 f2.following_id == current_user.id
             ))
             .where(f1.follower_id == current_user.id)
-        ).scalars().all()
+        )
+
+        friends_ids = friends_ids_Q.scalars().all()
 
         likes_subq = (
             select(Likes.post_id, func.count().label("likes_count"))
@@ -446,7 +469,7 @@ def get_friends(request: Request, current_user=Depends(get_current_user)):
             .subquery("is_liked_subq")
         )
 
-        rows = session.execute(
+        rows_Q = await session.execute(
             select(Posts, Users, Tasks,
                    func.coalesce(likes_subq.c.likes_count, 0).label("likes_count"),
                    func.coalesce(comments_count_subq.c.comments_count, 0).label("comments_count"),
@@ -459,7 +482,9 @@ def get_friends(request: Request, current_user=Depends(get_current_user)):
             .outerjoin(is_liked_subq, is_liked_subq.c.post_id == Posts.id)
             .where(Posts.user_id.in_(friends_ids))
             .order_by(Posts.created_at.desc())
-        ).all()
+        )
+
+        rows = rows_Q.all()
 
         posts = []
         for post, author, task, likes_count, comments_count, is_liked in rows:
@@ -476,8 +501,8 @@ def get_friends(request: Request, current_user=Depends(get_current_user)):
                 "is_liked": is_liked,
             })
 
-        unread_pushes_count = unread_pushes_count_func(current_user)
-        unread_messages_count = unread_messages_count_func(current_user)
+        unread_pushes_count = await unread_pushes_count_func(current_user)
+        unread_messages_count = await unread_messages_count_func(current_user)
 
         return templates.TemplateResponse("feed/friends.html", {
             "request": request,
@@ -491,29 +516,35 @@ def get_friends(request: Request, current_user=Depends(get_current_user)):
 
 # Пуши
 @router.get("/push")
-def get_push(request: Request, current_user=Depends(get_current_user)):
+async def get_push(request: Request, current_user=Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
-    with session_factory() as session:
-        push_count = session.execute(
+    async with session_factory() as session:
+        push_count_Q = await session.execute(
             select(func.count()).select_from(Pushes)
             .where(Pushes.user_id == current_user.id, Pushes.is_read == False)
-        ).scalar()
+        )
 
-        unread_pushes = session.execute(
+        push_count = push_count_Q.scalar()
+
+        unread_pushes_Q = await session.execute(
             select(Pushes, Users)
             .outerjoin(Users, Pushes.sender_id == Users.id)
             .where(Pushes.user_id == current_user.id, Pushes.is_read == False)
             .order_by(Pushes.created_at.desc())
-        ).all()
+        )
 
-        read_pushes = session.execute(
+        unread_pushes = unread_pushes_Q.all()
+
+        read_pushes_Q = await session.execute(
             select(Pushes, Users)
             .outerjoin(Users, Pushes.sender_id == Users.id)
             .where(Pushes.user_id == current_user.id, Pushes.is_read == True)
             .order_by(Pushes.created_at.desc())
-        ).all()
+        )
+
+        read_pushes = read_pushes_Q.all()
 
         pushes_unread = []
         pushes_read = []
@@ -534,13 +565,13 @@ def get_push(request: Request, current_user=Depends(get_current_user)):
                 "text": push.text
             })
 
-        session.execute(
+        await session.execute(
             update(Pushes)
             .where(Pushes.user_id == current_user.id, Pushes.is_read == False)
             .values(is_read=True)
         )
 
-        session.commit()
+        await session.commit()
 
         return templates.TemplateResponse("feed/push.html", {
             "request": request,
@@ -554,14 +585,16 @@ def get_push(request: Request, current_user=Depends(get_current_user)):
 
 # Список друзей пользователя
 @router.get("/profile/{username}/friends_list")
-def get_friends_list(request: Request, username: str, current_user=Depends(get_current_user)):
+async def get_friends_list(request: Request, username: str, current_user=Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
-    with session_factory() as session:
-        user = session.execute(
+    async with session_factory() as session:
+        user_Q = await session.execute(
             select(Users).where(Users.username == username)
-        ).scalar_one_or_none()
+        )
+
+        user = user_Q.scalar_one_or_none()
 
         if not user:
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
@@ -571,7 +604,7 @@ def get_friends_list(request: Request, username: str, current_user=Depends(get_c
         f1 = aliased(Followers)
         f2 = aliased(Followers)
 
-        friends_count = session.execute(
+        friends_count_Q = await session.execute(
             select(func.count())
             .select_from(f1)
             .join(f2, and_(
@@ -579,21 +612,27 @@ def get_friends_list(request: Request, username: str, current_user=Depends(get_c
                 f2.following_id == current_user.id
             ))
             .where(f1.follower_id == current_user.id)
-        ).scalar()
+        )
 
-        friends_ids = session.execute(
+        friends_count = friends_count_Q.scalar()
+
+        friends_ids_Q = await session.execute(
             select(f1.following_id)
             .join(f2, and_(
                 f1.following_id == f2.follower_id,
                 f2.following_id == user.id
             ))
             .where(f1.follower_id == user.id)
-        ).scalars().all()
+        )
 
-        rows = session.execute(
+        friends_ids = friends_ids_Q.scalars().all()
+
+        rows_Q = await session.execute(
             select(Users)
             .where(Users.id.in_(friends_ids))
-        ).scalars().all()
+        )
+
+        rows = rows_Q.scalars().all()
 
         results = []
 
@@ -603,8 +642,8 @@ def get_friends_list(request: Request, username: str, current_user=Depends(get_c
                 "avatar_url": result.avatar_url,
             })
 
-        unread_pushes_count = unread_pushes_count_func(current_user)
-        unread_messages_count = unread_messages_count_func(current_user)
+        unread_pushes_count = await unread_pushes_count_func(current_user)
+        unread_messages_count = await unread_messages_count_func(current_user)
 
         return templates.TemplateResponse("feed/users-list.html", {
             "request": request,
@@ -619,35 +658,43 @@ def get_friends_list(request: Request, username: str, current_user=Depends(get_c
 
 # Список подписчиков пользователя
 @router.get("/profile/{username}/subs_list")
-def get_subs_list(request: Request, username: str, current_user=Depends(get_current_user)):
+async def get_subs_list(request: Request, username: str, current_user=Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
-    with session_factory() as session:
-        user = session.execute(
+    async with session_factory() as session:
+        user_Q = await session.execute(
             select(Users).where(Users.username == username)
-        ).scalar_one_or_none()
+        )
+
+        user = user_Q.scalar_one_or_none()
 
         if not user:
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                 return JSONResponse({"error": "Пользователь не найден"}, status_code=404)
             return RedirectResponse("/404", status_code=303)
 
-        subs_count = session.execute(
+        subs_count_Q = await session.execute(
             select(func.count())
             .select_from(Followers)
             .where(Followers.following_id == user.id)
-        ).scalar()
+        )
 
-        subs_ids = session.execute(
+        subs_count = subs_count_Q.scalar()
+
+        subs_ids_Q = await session.execute(
             select(Followers.follower_id)
             .where(Followers.following_id == user.id)
-        ).scalars().all()
+        )
 
-        rows = session.execute(
+        subs_ids = subs_ids_Q.scalars().all()
+
+        rows_Q = await session.execute(
             select(Users)
             .where(Users.id.in_(subs_ids))
-        ).scalars().all()
+        )
+
+        rows = rows_Q.scalars().all()
 
         results = []
 
@@ -657,8 +704,8 @@ def get_subs_list(request: Request, username: str, current_user=Depends(get_curr
                 "avatar_url": result.avatar_url,
             })
 
-        unread_pushes_count = unread_pushes_count_func(current_user)
-        unread_messages_count = unread_messages_count_func(current_user)
+        unread_pushes_count = await unread_pushes_count_func(current_user)
+        unread_messages_count = await unread_messages_count_func(current_user)
 
         return templates.TemplateResponse("feed/users-list.html", {
             "request": request,
@@ -672,35 +719,43 @@ def get_subs_list(request: Request, username: str, current_user=Depends(get_curr
 
 # Список подписок пользователя
 @router.get("/profile/{username}/following_list")
-def get_following_list(request: Request, username: str, current_user=Depends(get_current_user)):
+async def get_following_list(request: Request, username: str, current_user=Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
-    with session_factory() as session:
-        user = session.execute(
+    async with session_factory() as session:
+        user_Q = await session.execute(
             select(Users).where(Users.username == username)
-        ).scalar_one_or_none()
+        )
+
+        user = user_Q.scalar_one_or_none()
 
         if not user:
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                 return JSONResponse({"error": "Пользователь не найден"}, status_code=404)
             return RedirectResponse("/404", status_code=303)
 
-        following_count = session.execute(
+        following_count_Q = await session.execute(
             select(func.count())
             .select_from(Followers)
             .where(Followers.follower_id == user.id)
-        ).scalar()
+        )
 
-        following_ids = session.execute(
+        following_count = following_count_Q.scalar()
+
+        following_ids_Q = await session.execute(
             select(Followers.following_id)
             .where(Followers.follower_id == user.id)
-        ).scalars().all()
+        )
 
-        rows = session.execute(
+        following_ids = following_ids_Q.scalars().all()
+
+        rows_Q = await session.execute(
             select(Users)
             .where(Users.id.in_(following_ids))
-        ).scalars().all()
+        )
+
+        rows = rows_Q.scalars().all()
 
         results = []
 
@@ -710,8 +765,8 @@ def get_following_list(request: Request, username: str, current_user=Depends(get
                 "avatar_url": result.avatar_url,
             })
 
-        unread_pushes_count = unread_pushes_count_func(current_user)
-        unread_messages_count = unread_messages_count_func(current_user)
+        unread_pushes_count = await unread_pushes_count_func(current_user)
+        unread_messages_count = await unread_messages_count_func(current_user)
 
         return templates.TemplateResponse("feed/users-list.html", {
             "request": request,
@@ -725,28 +780,32 @@ def get_following_list(request: Request, username: str, current_user=Depends(get
 
 # Список чатов
 @router.get("/chats")
-def get_chats(request: Request, current_user=Depends(get_current_user)):
+async def get_chats(request: Request, current_user=Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
-    with session_factory() as session:
-        sent_ids = session.execute(
+    async with session_factory() as session:
+        sent_ids_Q = await session.execute(
             select(Messages.receiver_id)
             .where(Messages.sender_id == current_user.id)
-        ).scalars().all()
+        )
 
-        received_ids = session.execute(
+        sent_ids = sent_ids_Q.scalars().all()
+
+        received_ids_Q = await session.execute(
             select(Messages.sender_id)
             .where(Messages.receiver_id == current_user.id)
-        ).scalars().all()
+        )
+
+        received_ids = received_ids_Q.scalars().all()
 
         companion_ids = set(sent_ids + received_ids)
 
         results = []
         for companion_id in companion_ids:
-            companion = session.get(Users, companion_id)
+            companion = await session.get(Users, companion_id)
 
-            messages_count = session.execute(
+            messages_count_Q = await session.execute(
                 select(func.count())
                 .select_from(Messages)
                 .where(
@@ -754,7 +813,9 @@ def get_chats(request: Request, current_user=Depends(get_current_user)):
                     Messages.receiver_id == current_user.id,
                     Messages.is_read == False
                 )
-            ).scalar()
+            )
+
+            messages_count = messages_count_Q.scalar()
 
             results.append({
                 "username": companion.username,
@@ -762,16 +823,18 @@ def get_chats(request: Request, current_user=Depends(get_current_user)):
                 "messages_count": cut_pushes_count(messages_count),
             })
 
-        total_unread = session.execute(
+        total_unread_Q = await session.execute(
             select(func.count())
             .select_from(Messages)
             .where(
                 Messages.receiver_id == current_user.id,
                 Messages.is_read == False
             )
-        ).scalar()
+        )
 
-        unread_pushes_count = unread_pushes_count_func(current_user)
+        total_unread = total_unread_Q.scalar()
+
+        unread_pushes_count = await unread_pushes_count_func(current_user)
 
     return templates.TemplateResponse("feed/users-list.html", {
         "request": request,
@@ -784,27 +847,33 @@ def get_chats(request: Request, current_user=Depends(get_current_user)):
     })
 
 @router.get("/chats/{username}")
-def get_chat_with_user(username: str, request: Request, current_user=Depends(get_current_user)):
+async def get_chat_with_user(username: str, request: Request, current_user=Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
-    with session_factory() as session:
-        companion = session.execute(
+    async with session_factory() as session:
+        companion_Q = await session.execute(
             select(Users)
             .where(Users.username == username)
-        ).scalar()
+        )
 
-        companion_messages_query = session.execute(
+        companion = companion_Q.scalar()
+
+        companion_messages_query_Q = await session.execute(
             select(Messages)
             .where(Messages.sender_id == companion.id, Messages.receiver_id == current_user.id)
             .order_by(asc(Messages.created_at))
-        ).scalars().all()
+        )
 
-        user_messages_query = session.execute(
+        companion_messages_query = companion_messages_query_Q.scalars().all()
+
+        user_messages_query_Q = await session.execute(
             select(Messages)
             .where(Messages.sender_id == current_user.id, Messages.receiver_id == companion.id)
             .order_by(asc(Messages.created_at))
-        ).scalars().all()
+        )
+
+        user_messages_query = user_messages_query_Q.scalars().all()
 
         all_messages = []
 
@@ -826,9 +895,9 @@ def get_chat_with_user(username: str, request: Request, current_user=Depends(get
 
         all_messages.sort(key=lambda m: m["created_at"])
 
-        unread_pushes_count = unread_pushes_count_func(current_user)
+        unread_pushes_count = await unread_pushes_count_func(current_user)
 
-        session.execute(
+        await session.execute(
             update(Messages)
             .where(
                 Messages.sender_id == companion.id,
@@ -838,7 +907,7 @@ def get_chat_with_user(username: str, request: Request, current_user=Depends(get
             .values(is_read=True)
         )
 
-        session.commit()
+        await session.commit()
 
     return templates.TemplateResponse("feed/chats.html", {
         "all_messages": all_messages,
@@ -853,31 +922,35 @@ def get_chat_with_user(username: str, request: Request, current_user=Depends(get
 
 # Логика лайка
 @router.post("/post/{post_id}/like")
-def toggle_like(post_id: int, current_user=Depends(get_current_user)):
+async def toggle_like(post_id: int, current_user=Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
-    with session_factory() as session:
-        post = session.execute(
+    async with session_factory() as session:
+        post_Q = await session.execute(
             select(Posts)
             .where(Posts.id == post_id)
-        ).scalar_one_or_none()
+        )
+
+        post = post_Q.scalar_one_or_none()
 
         if not post:
             return {"ok": False, "error": "Пост не найден"}
 
-        existing = session.execute(
+        existing_Q = await session.execute(
             select(Likes).where(
                 Likes.post_id == post_id,
                 Likes.user_id == current_user.id
             )
-        ).scalar_one_or_none()
+        )
+
+        existing = existing_Q.scalar_one_or_none()
 
         if existing:
-            session.delete(existing)
+            await session.delete(existing)
 
             if post.user_id != current_user.id:
-                push = session.execute(
+                push_Q = await session.execute(
                     select(Pushes)
                     .where(
                         Pushes.post_id == post_id,
@@ -885,12 +958,14 @@ def toggle_like(post_id: int, current_user=Depends(get_current_user)):
                         Pushes.user_id == post.user_id,
                         Pushes.sender_id == current_user.id
                     )
-                ).scalar_one_or_none()
+                )
+
+                push = push_Q.scalar_one_or_none()
 
                 if push:
-                    session.delete(push)
+                    await session.delete(push)
 
-            session.commit()
+            await session.commit()
             liked = False
         else:
             session.add(Likes(post_id=post_id, user_id=current_user.id))
@@ -904,86 +979,99 @@ def toggle_like(post_id: int, current_user=Depends(get_current_user)):
                         is_read=False,
                     )
                 )
-                delete_old_pushes(post.user_id)
-            session.commit()
+                await delete_old_pushes(post.user_id)
+            await session.commit()
             liked = True
 
-        count = session.execute(
-            select(func.count()).where(Likes.post_id == post_id)
-        ).scalar()
+        count_Q = await session.execute(
+            select(func.count())
+            .select_from(Likes)
+            .where(Likes.post_id == post_id)
+        )
+
+        count = count_Q.scalar()
 
     return {"ok": True, "liked": liked, "count": cut_numbers(count)}
 
 # Логика подписки
 @router.post("/profile/{username}/follow")
-def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
+async def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
-    with session_factory() as session:
-        user = session.execute(
+    async with session_factory() as session:
+        user_Q = await session.execute(
             select(Users).where(Users.username == username)
-        ).scalar_one_or_none()
+        )
+        user = user_Q.scalar_one_or_none()
 
         if not user:
             return {"ok": False, "error": "Пользователь не найден"}
 
-        existing = session.execute(
+        existing_Q = await session.execute(
             select(Followers).where(
                 Followers.following_id == user.id,
                 Followers.follower_id == current_user.id
             )
-        ).scalar_one_or_none()
+        )
+        existing = existing_Q.scalar_one_or_none()
 
         # Проверяем подписан ли user на current_user
-        reverse = session.execute(
+        reverse_Q = await session.execute(
             select(Followers).where(
                 Followers.following_id == current_user.id,
                 Followers.follower_id == user.id
             )
-        ).scalar_one_or_none()
+        )
+
+        reverse = reverse_Q.scalar_one_or_none()
 
         if existing:
-            session.delete(existing)
+            await session.delete(existing)
 
-            push_sub = session.execute(
+            push_sub_Q = await session.execute(
                 select(Pushes)
                 .where(
                     Pushes.user_id == user.id,
                     Pushes.sender_id == current_user.id,
                     Pushes.type == PushType.FOLLOW,
                 )
-            ).scalar_one_or_none()
+            )
+
+            push_sub = push_sub_Q.scalar_one_or_none()
 
             if push_sub:
-                session.delete(push_sub)
+                await session.delete(push_sub)
 
             if reverse:
-                push_fri_1 = session.execute(
+                push_fri_1_Q = await session.execute(
                     select(Pushes)
                     .where(
                         Pushes.user_id == user.id,
                         Pushes.sender_id == current_user.id,
                         Pushes.type == PushType.FRIENDS,
                     )
-                ).scalar_one_or_none()
+                )
 
-                push_fri_2 = session.execute(
+                push_fri_1 = push_fri_1_Q.scalar_one_or_none()
+
+                push_fri_2_Q = await session.execute(
                     select(Pushes)
                     .where(
                         Pushes.user_id == current_user.id,
                         Pushes.sender_id == user.id,
                         Pushes.type == PushType.FRIENDS,
                     )
-                ).scalar_one_or_none()
+                )
+                push_fri_2 = push_fri_2_Q.scalar_one_or_none()
 
                 if push_fri_1:
-                    session.delete(push_fri_1)
+                    await session.delete(push_fri_1)
 
                 if push_fri_2:
-                    session.delete(push_fri_2)
+                    await session.delete(push_fri_2)
 
-            session.commit()
+            await session.commit()
             is_subscribed = False
         else:
             session.add(Followers(following_id=user.id, follower_id=current_user.id))
@@ -995,7 +1083,7 @@ def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
                 is_read=False,
                 type=PushType.FOLLOW,
             ))
-            delete_old_pushes(user.id)
+            await delete_old_pushes(user.id)
 
             if reverse:
                 session.add(Pushes(
@@ -1005,7 +1093,7 @@ def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
                     is_read=False,
                     type=PushType.FRIENDS,
                 ))
-                delete_old_pushes(user.id)
+                await delete_old_pushes(user.id)
 
                 session.add(Pushes(
                     user_id=current_user.id,
@@ -1014,19 +1102,21 @@ def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
                     is_read=False,
                     type=PushType.FRIENDS,
                 ))
-                delete_old_pushes(current_user.id)
+                await delete_old_pushes(current_user.id)
 
-            session.commit()
+            await session.commit()
             is_subscribed = True
 
-        followers_count = session.execute(
-            select(func.count()).where(Followers.following_id == user.id)
-        ).scalar()
+        followers_count_Q = await session.execute(
+            select(func.count()).select_from(Followers).where(Followers.following_id == user.id)
+        )
+
+        followers_count = followers_count_Q.scalar()
 
         f1 = aliased(Followers)
         f2 = aliased(Followers)
 
-        friends_count = session.execute(
+        friends_count_Q = await session.execute(
             select(func.count())
             .select_from(f1)
             .join(
@@ -1037,9 +1127,10 @@ def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
                 )
             )
             .where(f1.follower_id == user.id)
-        ).scalar()
+        )
+        friends_count = friends_count_Q.scalar()
 
-        unread_pushes_count = unread_pushes_count_func(current_user)
+        unread_pushes_count = await unread_pushes_count_func(current_user)
 
         return {"ok": True,
                 "is_subscribed": is_subscribed,
@@ -1052,18 +1143,19 @@ def toggle_subscribe(username: str, current_user=Depends(get_current_user)):
 
 # Логика публикации коммента
 @router.post("/post/{post_id}/post-comment")
-def post_comment(post_id: int, text: str = Form(...), current_user=Depends(get_current_user)):
+async def post_comment(post_id: int, text: str = Form(...), current_user=Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
     if len(text) > 500:
         return {"error": "Длина комментария больше 500 символов"}
 
-    with session_factory() as session:
-        post = session.execute(
+    async with session_factory() as session:
+        post_Q = await session.execute(
             select(Posts)
             .where(Posts.id == post_id)
-        ).scalar_one_or_none()
+        )
+        post = post_Q.scalar_one_or_none()
 
         if not post:
             return {"error": "Пост не найден"}
@@ -1083,14 +1175,14 @@ def post_comment(post_id: int, text: str = Form(...), current_user=Depends(get_c
                 is_read=False,
                 type=PushType.COMMENT,
             ))
-            delete_old_pushes(post.user_id)
-        session.commit()
+            await delete_old_pushes(post.user_id)
+        await session.commit()
 
     return {"ok": True}
 
 # Ручка обновления настроек
 @router.post("/settings/apply")
-def update_settings(
+async def update_settings(
     bio: str = Form(None),
     avatar: UploadFile = File(None),
     current_user=Depends(get_current_user)
@@ -1101,10 +1193,11 @@ def update_settings(
     if bio is not None and len(bio) > 150:
         return {"error": "Максимальная длина описания профиля — 150 символов"}
 
-    with session_factory() as session:
-        user = session.execute(
+    async with session_factory() as session:
+        user_Q = await session.execute(
             select(Users).where(Users.username == current_user.username)
-        ).scalar_one_or_none()
+        )
+        user = user_Q.scalar_one_or_none()
 
         if not user:
             return {"error": "Пользователя не существует"}
@@ -1112,22 +1205,30 @@ def update_settings(
         user.bio = bio
 
         if avatar and avatar.filename:
-            user.avatar_url = upload_avatar(avatar.file, current_user.username)
+            loop = asyncio.get_running_loop()
+            user.avatar_url = await loop.run_in_executor(
+                None,
+                upload_avatar,
+                avatar.file,
+                current_user.username
+            )
 
-        session.commit()
+        await session.commit()
         return {"avatar_url": user.avatar_url, "bio": user.bio}
 
 # Ручка удаления поста
 @router.post("/post/{post_id}/delete")
-def delete_post(post_id: int, current_user=Depends(get_current_user)):
+async def delete_post(post_id: int, current_user=Depends(get_current_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=303)
 
-    with session_factory() as session:
-        post = session.execute(
+    async with session_factory() as session:
+        post_Q = await session.execute(
             select(Posts)
             .where(Posts.id == post_id)
-        ).scalar_one_or_none()
+        )
+
+        post = post_Q.scalar_one_or_none()
 
         if not post:
             return {"error": "Ошибка удаления"}
@@ -1135,13 +1236,14 @@ def delete_post(post_id: int, current_user=Depends(get_current_user)):
         if post.user_id != current_user.id:
             return {"error": "У Вас нет прав удалить этот пост"}
 
-        session.delete(post)
-        session.commit()
+        await session.delete(post)
+        await session.commit()
 
-        posts_count =  session.execute(
+        posts_count_Q = await session.execute(
             select(func.count()).select_from(Posts)
             .where(Posts.user_id == current_user.id)
-        ).scalar()
+        )
+        posts_count = posts_count_Q.scalar()
 
         return {"ok": True,
                 "message": "Ваш пост был успешно удален",
@@ -1151,25 +1253,26 @@ def delete_post(post_id: int, current_user=Depends(get_current_user)):
 
 # Удаление аккаунта
 @router.post("/settings/delete-account")
-def delete_account(current_user=Depends(get_current_user)):
+async def delete_account(current_user=Depends(get_current_user)):
     if not current_user:
         resp = JSONResponse({"ok": False, "error": "Сессия недействительна"})
         resp.delete_cookie("access_token")
         return resp
 
-    with session_factory() as session:
-        user = session.execute(
+    async with session_factory() as session:
+        user_Q = await session.execute(
             select(Users).where(Users.username == current_user.username)
-        ).scalar_one_or_none()
+        )
+        user = user_Q.scalar_one_or_none()
 
         if not user:
             return JSONResponse({"ok": False, "error": "Не удалось удалить аккаунт"})
 
         if user.avatar_url and "cloudinary.com" in user.avatar_url:
-            delete_avatar(user.username)
+            await asyncio.to_thread(delete_avatar, user.username)
 
-        session.delete(user)
-        session.commit()
+        await session.delete(user)
+        await session.commit()
 
     response = JSONResponse({"ok": True})
     response.delete_cookie("access_token")
@@ -1179,7 +1282,7 @@ def delete_account(current_user=Depends(get_current_user)):
 # == WEBSOCKETS ==
 
 @router.websocket("/chats/{username}/ws")
-async def websocket_endpoint(username: str, websocket: WebSocket, current_user=Depends(get_current_user)):
+async def chat_websocket_endpoint(username: str, websocket: WebSocket, current_user=Depends(get_current_user)):
     if not current_user:
         await websocket.close()
         return
@@ -1194,10 +1297,12 @@ async def websocket_endpoint(username: str, websocket: WebSocket, current_user=D
             if not text:
                 continue
 
-            with session_factory() as session:
-                companion = session.execute(
+            async with session_factory() as session:
+                companion_Q = await session.execute(
                     select(Users).where(Users.username == username)
-                ).scalar_one_or_none()
+                )
+
+                companion = companion_Q.scalar_one_or_none()
 
                 if not companion:
                     continue
@@ -1208,8 +1313,8 @@ async def websocket_endpoint(username: str, websocket: WebSocket, current_user=D
                     text=text
                 )
                 session.add(msg)
-                session.commit()
-                session.refresh(msg)
+                await session.commit()
+                await session.refresh(msg)
 
                 companion_id = companion.id
                 time_str = format_time_H_M(msg.created_at)
@@ -1222,3 +1327,13 @@ async def websocket_endpoint(username: str, websocket: WebSocket, current_user=D
 
     except WebSocketDisconnect:
         manager.disconnect(current_user.id)
+
+@router.websocket("/ws/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: int):
+    await manager.connect(user_id, websocket)
+    try:
+        while True:
+            # Просто держим соединение живым
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(user_id, websocket)

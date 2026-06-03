@@ -29,9 +29,11 @@
         <div class="chats {% if chats %}active{% endif %}">
             <div class="chats-icon-wrapper">
                 <img src="/static/feed/images/chats.svg" alt="">
-                <div class="chats-badge" id="chats-badge">
-                    {{ unread_pushes_count }}
+                {% if unread_messages_count %}
+                <div class="chats-badge" id="chats-badge" {% if unread_messages_count == "0" %}style="display:none"{% endif %}>
+                    {{ unread_messages_count }}
                 </div>
+                {% endif %}
             </div>
                 <p class="menu-text">Чаты</p>
         </div>

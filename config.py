@@ -3,6 +3,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     DATABASE_URL_psycopg: str
+    DATABASE_URL_asyncpg: str
     MAIL_EMAIL: str
     MAIL_PASSWORD: str
     SECRET_KEY: str

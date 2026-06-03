@@ -1,8 +1,6 @@
 from datetime import datetime
-
 from sqlalchemy import select
 from sqlalchemy.sql.expression import insert, delete, update
-
 from database import session_factory
 from models import Users, PendingUsers
 from config import settings

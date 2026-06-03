@@ -5,7 +5,7 @@ from models import Users
 from services.auth_jwt import decode_access_token
 
 
-def get_current_user(access_token: str = Cookie(None)):
+async def get_current_user(access_token: str = Cookie(None)):
     if not access_token:
         return None
 
@@ -13,8 +13,8 @@ def get_current_user(access_token: str = Cookie(None)):
     if not username:
         return None
 
-    with session_factory() as session:
+    async with session_factory() as session:
         query = select(Users).where(Users.username == username)
-        result = session.execute(query)
+        result = await session.execute(query)
         user = result.scalar_one_or_none()
         return user

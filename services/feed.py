@@ -1,12 +1,8 @@
-from datetime import datetime, timezone, timedelta
-import zoneinfo
-
-from sqlalchemy.orm.session import Session
+from datetime import datetime, timezone
 from sqlalchemy.sql.expression import select, delete
 from sqlalchemy.sql.functions import func
-
 from database import session_factory
-from models import Pushes, created_at, Messages
+from models import Pushes, Messages
 
 
 def time_ago(dt):
@@ -130,51 +126,59 @@ def cut_text(text):
         return text
 
 
-def delete_old_pushes(user_id):
-    with session_factory() as session:
+async def delete_old_pushes(user_id):
+    async with session_factory() as session:
 
-        count = session.execute(
+        count_Q = await session.execute(
             select(func.count()).where(Pushes.user_id == user_id)
-        ).scalar()
+        )
+
+        count = count_Q.scalar()
 
         if count > 250:
-            old_ids = session.execute(
+            old_ids_Q = await session.execute(
                 select(Pushes.id)
                 .where(Pushes.user_id == user_id)
                 .order_by(Pushes.created_at.desc())
                 .offset(250)
-            ).scalars().all()
+            )
 
-            session.execute(
+            old_ids = old_ids_Q.scalars().all()
+
+            await session.execute(
                 delete(Pushes).where(Pushes.id.in_(old_ids))
             )
-            session.commit()
+            await session.commit()
 
 def cut_pushes_count(pushes_count):
     if pushes_count > 99:
         return "99+"
     return str(pushes_count)
 
-def unread_pushes_count_func(current_user):
-    with session_factory() as session:
-        count = session.execute(
+async def unread_pushes_count_func(current_user):
+    async with session_factory() as session:
+        count_Q = await session.execute(
             select(func.count())
             .select_from(Pushes)
             .where(Pushes.user_id == current_user.id, Pushes.is_read == False)
-        ).scalar_one_or_none()
+        )
+
+        count = count_Q.scalar_one_or_none()
 
         return count
 
-def unread_messages_count_func(current_user):
-    with session_factory() as session:
-        count = session.execute(
+async def unread_messages_count_func(current_user):
+    async with session_factory() as session:
+        count_Q = await session.execute(
             select(func.count())
             .select_from(Messages)
             .where(
                 Messages.receiver_id == current_user.id,
                 Messages.is_read == False,
             )
-        ).scalar_one_or_none()
+        )
+
+        count = count_Q.scalar_one_or_none()
 
         return count
 
