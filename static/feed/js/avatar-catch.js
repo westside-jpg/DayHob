@@ -58,6 +58,9 @@ document.getElementById('apply-changes').addEventListener('click', async () => {
     const bio = document.getElementById('bio').value
     const errorBlock = document.querySelector('.error')
     const btn = document.getElementById('apply-changes')
+    const deleteAccount = document.querySelector('.delete-account')
+    const trashWhite = document.querySelector('.icon-white')
+    const trashRed = document.querySelector('.icon-red')
 
     if (bio.length > 150) {
         errorBlock.textContent = 'Максимальная длина описания профиля — 150 символов'
@@ -88,6 +91,9 @@ document.getElementById('apply-changes').addEventListener('click', async () => {
     btn.style.borderColor = 'gray'
     btn.disabled = true
     btn.style.cursor = 'not-allowed'
+    deleteAccount.classList.add('disabled');
+    trashWhite.style.display = 'none'
+    trashRed.src = '/static/feed/images/trash-gray.svg'
 
     errorBlock.style.display = 'none'
 
@@ -131,6 +137,11 @@ document.getElementById('apply-changes').addEventListener('click', async () => {
         btn.style.background = 'white'
         btn.disabled = false
         btn.style.cursor = 'pointer'
+
+        deleteAccount.classList.remove('disabled');
+        trashWhite.style.display = 'flex'
+        trashRed.src = '/static/feed/images/trash-red.svg'
+
     } catch (e) {
         showToast('Не удалось сохранить настройки', 'error')
     } finally {

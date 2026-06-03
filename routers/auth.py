@@ -11,7 +11,7 @@ templates = Jinja2Templates(directory="templates")
 
 # == GET-РУЧКИ == #
 @router.get("/login", response_class=HTMLResponse)
-def login_page_get(request: Request,
+async def login_page_get(request: Request,
                    registered: str = None):
     success = registered == "true"
     return templates.TemplateResponse("auth/login.html",
@@ -20,22 +20,22 @@ def login_page_get(request: Request,
                                       )
 
 @router.get("/register", response_class=HTMLResponse)
-def register_page_get(request: Request):
+async def register_page_get(request: Request):
     return templates.TemplateResponse("auth/register.html", {"request": request})
 
 @router.get("/register/email_verification", response_class=HTMLResponse)
-def email_verification_page_get(request: Request, email: str):
+async def email_verification_page_get(request: Request, email: str):
     return templates.TemplateResponse("auth/email_verification.html", {"request": request, "email": email})
 
 # == POST-РУЧКИ == #
 @router.post("/login", response_class=HTMLResponse)
-def login_page_post(
+async def login_page_post(
         request: Request,
         username: str = Form(...),
         password: str = Form(...),
 ):
     username_clean = username.strip()
-    approve, error = verify_login(username_clean, password)
+    approve, error = await verify_login(username_clean, password)
 
     if not approve:
         return templates.TemplateResponse("auth/login.html", {"request": request, "error": error, "username": username_clean})
@@ -55,14 +55,14 @@ def login_page_post(
 
 
 @router.post("/register", response_class=HTMLResponse)
-def register_page_post(
+async def register_page_post(
         request: Request,
         username: str = Form(...),
         email: str = Form(...),
         password: str = Form(...),
         password_confirm: str = Form(...),
 ):
-    errors, username_clean, email_clean = check_register(
+    errors, username_clean, email_clean = await check_register(
         username, email, password, password_confirm
     )
 
@@ -78,7 +78,7 @@ def register_page_post(
         )
 
     hashed_password = hash_password(password)
-    errors, code = register_pending_user(username_clean, hashed_password, email_clean)
+    errors, code = await register_pending_user(username_clean, hashed_password, email_clean)
 
     if errors:
         return templates.TemplateResponse(
@@ -95,11 +95,11 @@ def register_page_post(
     return RedirectResponse(f"/register/email_verification?email={email_clean}", status_code=303)
 
 @router.post("/register/email_verification", response_class=HTMLResponse)
-def email_verification_page_post(request: Request,
+async def email_verification_page_post(request: Request,
                                  code: str = Form(...),
                                  email: str = Form(...)):
 
-    approve, error, blocked = check_verification_email_and_register(email, code)
+    approve, error, blocked = await check_verification_email_and_register(email, code)
 
     if not approve:
         return templates.TemplateResponse("auth/email_verification.html",
@@ -115,8 +115,8 @@ def email_verification_page_post(request: Request,
     )
 
 @router.post("/register/resend_code")
-def resend_verification_code(email: str = Form(...)):
-    code = update_pending_user_code(email)
+async def resend_verification_code(email: str = Form(...)):
+    code = await update_pending_user_code(email)
     send_verification_email(email, code)
     return RedirectResponse(
         f"/register/email_verification?email={email}&resent=true",

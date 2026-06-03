@@ -256,6 +256,20 @@
     margin-bottom: 30px;
 }
 
+.delete-account.disabled {
+    background: #d3d3d3;
+    border-color: #a0a0a0;
+    color: #808080;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.delete-account.disabled:hover {
+    transform: none;
+    box-shadow: none;
+    background: #d3d3d3;
+}
+
 .yes {
     width: 150px;
     height: 50px;

@@ -1326,7 +1326,7 @@ async def chat_websocket_endpoint(username: str, websocket: WebSocket, current_u
             })
 
     except WebSocketDisconnect:
-        manager.disconnect(current_user.id)
+        manager.disconnect(current_user.id, websocket)
 
 @router.websocket("/ws/{user_id}")
 async def websocket_endpoint(websocket: WebSocket, user_id: int):

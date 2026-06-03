@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy import select
-from sqlalchemy.sql.expression import insert, delete, update
+from sqlalchemy.sql.expression import insert, delete
 from database import session_factory
 from models import Users, PendingUsers
 from config import settings
@@ -12,25 +12,25 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 # == РЕГИСТРАЦИЯ == #
-def check_email(email: str):
-    with session_factory() as session:
+async def check_email(email: str):
+    async with session_factory() as session:
         query = select(Users).where(Users.email == email)
-        result = session.execute(query)
+        result = await session.execute(query)
         if result.first() is None:
             return True
         else:
             return False
 
-def check_username(username: str):
-    with session_factory() as session:
+async def check_username(username: str):
+    async with session_factory() as session:
         query = select(Users).where(Users.username == username)
-        result = session.execute(query)
+        result = await session.execute(query)
         if result.first() is None:
             return True
         else:
             return False
 
-def check_register(username, email, password, confirm_password):
+async def check_register(username, email, password, confirm_password):
     errors = []
 
     username = username.strip()
@@ -78,12 +78,12 @@ def check_register(username, email, password, confirm_password):
 
     if not errors:
         # проверка на уникальность emali'а
-        good_email = check_email(email)
+        good_email = await check_email(email)
         if not good_email:
             errors.append("Такой email уже зарегестрирован")
 
         # проверка на уникальность username
-        good_username = check_username(username)
+        good_username = await check_username(username)
         if not good_username:
             errors.append("Такое имя пользователя уже занято")
 
@@ -95,24 +95,28 @@ def hash_password(password: str):
     hashed_password = hashed_password.decode('utf-8')
     return hashed_password
 
-def register_pending_user(username: str, password: str, email: str):
+async def register_pending_user(username: str, password: str, email: str):
     code = str(random.randint(100000, 999999))
 
-    with session_factory() as session:
+    async with session_factory() as session:
         errors = []
 
-        check_is_username_in_pending = session.execute(
+        check_is_username_in_pending_Q = await session.execute(
             select(PendingUsers)
             .where(PendingUsers.username == username)
-        ).scalar_one_or_none()
+        )
+
+        check_is_username_in_pending = check_is_username_in_pending_Q.scalar_one_or_none()
 
         if check_is_username_in_pending:
             errors.append("Такое имя пользователя уже занято")
             return errors, code
 
-        existing = session.execute(
+        existing_Q = await session.execute(
             select(PendingUsers).where(PendingUsers.email == email)
-        ).scalar_one_or_none()
+        )
+
+        existing = existing_Q.scalar_one_or_none()
 
         if existing:
             existing.username = username
@@ -130,7 +134,7 @@ def register_pending_user(username: str, password: str, email: str):
 
             session.add(pending_user)
 
-        session.commit()
+        await session.commit()
 
     return None, code
 
@@ -168,11 +172,13 @@ def send_verification_email(email: str, code: str):
         server.login(settings.MAIL_EMAIL, settings.MAIL_PASSWORD)
         server.sendmail(settings.MAIL_EMAIL, email, msg.as_string())
 
-def check_verification_email_and_register(email: str, input_code: str):
-    with session_factory() as session:
-        pending = session.execute(
+async def check_verification_email_and_register(email: str, input_code: str):
+    async with session_factory() as session:
+        pending_Q = await session.execute(
             select(PendingUsers).where(PendingUsers.email == email)
-        ).scalar_one_or_none()
+        )
+
+        pending = pending_Q.scalar_one_or_none()
 
         if not pending:
             return False, "Пользователь не найден", False
@@ -183,11 +189,11 @@ def check_verification_email_and_register(email: str, input_code: str):
         if pending.code != input_code:
             pending.attempts += 1
             remaining = 6 - pending.attempts
-            session.commit()
+            await session.commit()
 
             return False, f"Код неверный! Осталось попыток: {remaining}", False
 
-        session.execute(
+        await session.execute(
             insert(Users).values(
                 username=pending.username,
                 password=pending.password,
@@ -195,37 +201,39 @@ def check_verification_email_and_register(email: str, input_code: str):
             )
         )
 
-        session.execute(
+        await session.execute(
             delete(PendingUsers)
             .where(PendingUsers.email == email)
         )
 
-        session.commit()
+        await session.commit()
 
         return True, None, False
 
 
-def update_pending_user_code(email: str) -> str:
+async def update_pending_user_code(email: str) -> str:
     code = str(random.randint(100000, 999999))
 
-    with session_factory() as session:
-        pending = session.execute(
+    async with session_factory() as session:
+        pending_Q = await session.execute(
             select(PendingUsers).where(PendingUsers.email == email)
-        ).scalar_one_or_none()
+        )
+
+        pending = pending_Q.scalar_one_or_none()
 
         if pending:
             pending.code = code
             pending.attempts = 0
             pending.created_at = datetime.now()
-            session.commit()
+            await session.commit()
 
     return code
 
 # == ВХОД == #
-def verify_login(input_username: str, input_password: str):
-    with session_factory() as session:
+async def verify_login(input_username: str, input_password: str):
+    async with session_factory() as session:
         query = select(Users.password).where(Users.username == input_username)
-        result = session.execute(query)
+        result = await session.execute(query)
         row = result.first()
 
         if row is None:
@@ -241,4 +249,3 @@ def verify_login(input_username: str, input_password: str):
             return False, error
 
         return is_valid, None
-

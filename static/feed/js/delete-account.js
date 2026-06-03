@@ -1,4 +1,9 @@
 document.querySelector('.delete-account').addEventListener('click', () => {
+    const deleteAccount = document.querySelector('.delete-account');
+    if (deleteAccount.classList.contains('disabled')) {
+        return;
+    }
+
     const modal = document.getElementById('delete-account-modal')
     modal.style.display = 'flex'
     setTimeout(() => modal.classList.add('open'), 10)
