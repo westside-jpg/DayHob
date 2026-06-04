@@ -13,15 +13,18 @@
     <div class="task">
         <p>{{ task.title if task else "Задания на сегодня нет" }}</p>
     </div>
+    <p class="success-message" style="display:none">Ваш пост успешно опубликован</p>
     {% include "feed/components/posts.html" %}
 </div>
 
-<div class="add-post">
-    <button class="new-post">
-        <p>+</p>
-    </button>
-    <p>Создать пост</p>
-</div>
+<a href="/new-post">
+    <div class="add-post">
+        <button class="new-post">
+            <p>+</p>
+        </button>
+        <p>Создать пост</p>
+    </div>
+</a>
 
 {% endblock %}
 
@@ -32,4 +35,10 @@
 <script src="/static/feed/js/comments-show.js"></script>
 <script src="/static/feed/js/comment-send.js"></script>
 <script src="/static/feed/js/comment-textarea-extension.js"></script>
+<script>
+    if (window.location.search.includes('publish=true')) {
+        document.querySelector('.success-message').style.display = 'block'
+        window.history.replaceState({}, '', '/feed')
+    }
+</script>
 {% endblock %}

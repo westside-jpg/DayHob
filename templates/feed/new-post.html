@@ -1,0 +1,55 @@
+{% extends "feed/base.html" %}
+
+{% block title %}Новый пост{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="/static/feed/css/new-post.css">
+{% endblock %}
+
+{% block content %}
+<div class="new-post-container">
+
+    <a href="/feed" class="back-btn">
+        <img src="/static/feed/images/back.svg" alt="">
+    </a>
+
+    <div class="post-form">
+
+        <!-- Зона загрузки фото -->
+        <div class="upload-zone" id="upload-zone">
+            <div class="upload-placeholder" id="upload-placeholder">
+                <img src="/static/feed/images/load.svg" alt="" class="upload-icon">
+                <button class="upload-btn" type="button" onclick="document.getElementById('photo-input').click()">
+                    Загрузить фото
+                </button>
+            </div>
+            <img src="" alt="" class="preview-image" id="preview-image">
+            <input type="file" id="photo-input" accept="image/*" style="display:none">
+        </div>
+
+        <button class="upload-btn" id="edit-btn" type="button" onclick="document.getElementById('photo-input').click()" style="display:none">
+            Изменить фото
+        </button>
+
+        <!-- Описание поста -->
+        <textarea
+                class="post-description"
+                placeholder="Опишите свой пост..."
+                id="post-text"
+                maxlength="1024"
+                rows="1"
+        ></textarea>
+
+        <!-- Кнопка публикации -->
+        <button class="publish-btn" id="publish-btn">
+            <img id="publish-btn-img" src="/static/feed/images/send.svg" alt="">
+            <p class="publish-btn-text" id="publish-btn-text" style="display: none">Публикация поста...</p>
+        </button>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/feed/js/new-post.js"></script>
+{% endblock %}

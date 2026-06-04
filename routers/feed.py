@@ -7,7 +7,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql.expression import and_, update, asc
-from sqlalchemy.sql.functions import func
+from sqlalchemy.sql.functions import func, current_user
 from models import Tasks, Posts, Users, Likes, Comments, Followers, Pushes, PushType, Messages
 from database import session_factory
 from services.dependencies import get_current_user
@@ -15,7 +15,7 @@ from services.feed import time_ago, declination_friends, declination_subs, decli
     cut_numbers, declination_pushes, cut_text, delete_old_pushes, cut_pushes_count, unread_pushes_count_func, \
     declination_following, declination_messages, format_time_H_M, unread_messages_count_func
 from fastapi.responses import JSONResponse
-from services.cloudinary_func import upload_avatar, delete_avatar
+from services.cloudinary_func import upload_avatar, delete_avatar, upload_photo
 from services.websocket_manager import manager
 
 router = APIRouter()
@@ -918,6 +918,22 @@ async def get_chat_with_user(username: str, request: Request, current_user=Depen
         "chats": True,
     })
 
+@router.get("/new-post")
+async def get_new_post(request: Request, current_user=Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+
+    unread_pushes_count = await unread_pushes_count_func(current_user)
+    unread_messages_count = await unread_messages_count_func(current_user)
+
+    return templates.TemplateResponse("feed/new-post.html", {
+        "request": request,
+        "current_user": current_user,
+        "unread_pushes_count": cut_pushes_count(unread_pushes_count),
+        "unread_messages_count": cut_pushes_count(unread_messages_count),
+    })
+
+
 # == POST-РУЧКИ == #
 
 # Логика лайка
@@ -1278,6 +1294,63 @@ async def delete_account(current_user=Depends(get_current_user)):
     response.delete_cookie("access_token")
     return response
 
+@router.post("/new-post/create")
+async def create_new_post(
+        text: str = Form(None),
+        image: UploadFile = File(None),
+        current_user=Depends(get_current_user)
+):
+
+    text = text or ""
+
+    if len(text) > 1024:
+        return {"ok": False, "message": "Слишком длинное описание"}
+
+    if not current_user:
+        return {"ok": False, "message": "Пользователь не найден"}
+
+    async with session_factory() as session:
+        user_posts_count_Q = await session.execute(
+            select(func.count()).select_from(Posts)
+            .where(Posts.user_id == current_user.id)
+        )
+
+        user_posts_count = user_posts_count_Q.scalar()
+
+        task_Q = await session.execute(
+            select(Tasks.id)
+            .where(Tasks.date == date.today())
+        )
+
+        task = task_Q.scalar_one_or_none()
+
+        if not task:
+            return {"ok": False, "message": "Ошибка задания дня"}
+
+        image_url = None
+
+        if image and image.filename:
+            loop = asyncio.get_running_loop()
+            image_url = await loop.run_in_executor(
+                None,
+                upload_photo,
+                image.file,
+                user_posts_count,
+                current_user.username
+            )
+
+        session.add(
+            Posts(
+                user_id=current_user.id,
+                task_id=task,
+                text=text,
+                image_url=image_url,
+            )
+        )
+
+        await session.commit()
+
+        return {"ok": True}
 
 # == WEBSOCKETS ==
 
